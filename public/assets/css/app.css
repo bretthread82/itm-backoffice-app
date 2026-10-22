@@ -1,0 +1,149 @@
+/* Theme tokens: override Bootstrap CSS variables here to rebrand. */
+:root {
+    --bs-primary: #4f46e5;
+    --bs-primary-rgb: 79, 70, 229;
+    --bs-link-color: #4f46e5;
+    --bs-link-hover-color: #4338ca;
+    --bs-border-radius: .625rem;
+    --bs-border-radius-lg: .875rem;
+    --app-sidebar-width: 260px;
+    --app-sidebar-bg: #111827;
+    --app-sidebar-fg: #cbd5e1;
+    --app-surface: #f4f6fb;
+    --app-topbar-bg: #ffffff;
+}
+
+[data-bs-theme="dark"] {
+    --bs-primary: #818cf8;
+    --bs-primary-rgb: 129, 140, 248;
+    --bs-link-color: #a5b4fc;
+    --bs-link-hover-color: #c7d2fe;
+    --app-sidebar-bg: #0b1020;
+    --app-surface: #0f1424;
+    --app-topbar-bg: #151a2e;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: #4338ca;
+    --bs-btn-hover-border-color: #4338ca;
+    --bs-btn-active-bg: #3730a3;
+    --bs-btn-active-border-color: #3730a3;
+}
+
+body { background: var(--app-surface); }
+
+.app-shell { min-height: 100vh; display: flex; }
+.app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.app-content { flex: 1; padding: 1.5rem 1rem; max-width: 1400px; }
+@media (min-width: 992px) { .app-content { padding: 2rem; } }
+
+.app-sidebar {
+    width: var(--app-sidebar-width);
+    flex: 0 0 var(--app-sidebar-width);
+    background: var(--app-sidebar-bg);
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.app-brand {
+    display: flex; align-items: center; gap: .75rem;
+    padding: 1.25rem 1.5rem; margin-bottom: .5rem;
+    color: #fff; font-weight: 600; font-size: 1.1rem; text-decoration: none;
+}
+.app-brand i { color: var(--bs-primary); font-size: 1.4rem; }
+
+.app-sidebar .nav-link,
+.app-sidebar-mobile .nav-link {
+    color: var(--app-sidebar-fg);
+    display: flex; align-items: center; gap: .75rem;
+    padding: .65rem .9rem; border-radius: var(--bs-border-radius);
+}
+.app-sidebar .nav-link:hover,
+.app-sidebar-mobile .nav-link:hover { background: rgba(255, 255, 255, .06); color: #fff; }
+.app-sidebar .nav-link.active,
+.app-sidebar-mobile .nav-link.active { background: var(--bs-primary); color: #fff; }
+.app-sidebar .nav-link i { font-size: 1.1rem; }
+
+.app-sidebar-mobile { background: var(--app-sidebar-bg); --bs-offcanvas-width: 280px; }
+.app-sidebar-mobile .btn-close { filter: invert(1); }
+
+.app-topbar {
+    position: sticky; top: 0; z-index: 1020; height: 64px;
+    background: var(--app-topbar-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.avatar {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--bs-primary); color: #fff; font-size: .8rem; font-weight: 600;
+}
+
+.card { background: var(--bs-body-bg); }
+
+/* Auth pages */
+.auth-body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem;
+    background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%);
+}
+.auth-card { width: 100%; max-width: 440px; }
+.auth-logo {
+    width: 56px; height: 56px; margin: 0 auto; border-radius: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bs-primary); color: #fff; font-size: 1.6rem;
+}
+
+/* Responsive tables become stacked cards on small screens: add .table-stack and data-label on td */
+@media (max-width: 767.98px) {
+    .table-stack thead { display: none; }
+    .table-stack tr { display: block; margin-bottom: .75rem; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); }
+    .table-stack td { display: flex; justify-content: space-between; gap: 1rem; border: 0; padding: .5rem .85rem; }
+    .table-stack td::before { content: attr(data-label); font-weight: 600; color: var(--bs-secondary-color); }
+}
+
+.avatar-xl { width: 72px; height: 72px; font-size: 1.5rem; }
+.directory-card { transition: transform .15s ease, box-shadow .15s ease; }
+.directory-card:hover { transform: translateY(-2px); box-shadow: var(--bs-box-shadow) !important; }
+
+.avatar-img { object-fit: cover; background: var(--bs-secondary-bg); }
+.notif-panel { width: 340px; max-width: calc(100vw - 1.5rem); }
+.notif-panel .list-group { max-height: 360px; overflow-y: auto; }
+.notif-unread { background: rgba(var(--bs-primary-rgb), .07); }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: transparent; flex: 0 0 8px; }
+.notif-unread .notif-dot { background: var(--bs-primary); }
+.notif-row:hover { background: var(--bs-tertiary-bg); }
+
+/* Keep every primary-coloured control on the brand colour (Bootstrap hard-codes some defaults). */
+.btn-outline-primary {
+    --bs-btn-color: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: var(--bs-primary);
+    --bs-btn-hover-border-color: var(--bs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--bs-primary);
+    --bs-btn-active-border-color: var(--bs-primary);
+    --bs-btn-active-color: #fff;
+}
+.form-check-input:checked,
+.form-check-input[type="checkbox"]:indeterminate {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), .25);
+}
+.page-link { color: var(--bs-primary); }
+.page-item.active .page-link { background-color: var(--bs-primary); border-color: var(--bs-primary); color: #fff; }
+.nav-tabs .nav-link.active { color: var(--bs-primary); }
+
+/* The first cell of a stacked card already says who it is. */
+@media (max-width: 767.98px) {
+    .table-stack td[data-label="Name"]::before { display: none; }
+    .table-stack td[data-label="Name"] { justify-content: flex-start; }
+}
+
+.w-6rem { width: 6rem; }
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: var(--bs-primary); color: #fff; }
+.nav-pills .nav-link:not(.active) { color: var(--bs-primary); }

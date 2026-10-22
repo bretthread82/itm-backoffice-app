@@ -1,0 +1,111 @@
+<?php
+
+namespace Config;
+
+use App\Core\AuditService;
+use App\Core\Mailer;
+use App\Core\Mfa\DuoService;
+use App\Core\Mfa\EmailCodeService;
+use App\Core\Mfa\MfaPolicy;
+use App\Core\Mfa\MfaService;
+use App\Core\Mfa\TotpService;
+use App\Core\NotificationService;
+use App\Core\PasswordResetService;
+use App\Core\PermissionService;
+use App\Core\UserService;
+use CodeIgniter\Config\BaseService;
+
+/**
+ * Services Configuration file.
+ *
+ * Services are simply other classes/libraries that the system uses
+ * to do its job. This is used by CodeIgniter to allow the core of the
+ * framework to be swapped out easily without affecting the usage within
+ * the rest of your application.
+ *
+ * This file holds any application-specific services, or service overrides
+ * that you might need. An example has been included with the general
+ * method format you should use for your service methods. For more examples,
+ * see the core Services file at system/Config/Services.php.
+ */
+class Services extends BaseService
+{
+    public static function audit(bool $getShared = true): AuditService
+    {
+        if ($getShared) {
+            return static::getSharedInstance('audit');
+        }
+
+        return new AuditService();
+    }
+
+    public static function notifier(bool $getShared = true): NotificationService
+    {
+        if ($getShared) {
+            return static::getSharedInstance('notifier');
+        }
+
+        return new NotificationService();
+    }
+
+    public static function userService(bool $getShared = true): UserService
+    {
+        if ($getShared) {
+            return static::getSharedInstance('userService');
+        }
+
+        return new UserService();
+    }
+
+    public static function mfa(bool $getShared = true): MfaService
+    {
+        return $getShared ? static::getSharedInstance('mfa') : new MfaService();
+    }
+
+    public static function mfaPolicy(bool $getShared = true): MfaPolicy
+    {
+        return $getShared ? static::getSharedInstance('mfaPolicy') : new MfaPolicy();
+    }
+
+    public static function totp(bool $getShared = true): TotpService
+    {
+        return $getShared ? static::getSharedInstance('totp') : new TotpService();
+    }
+
+    public static function emailCode(bool $getShared = true): EmailCodeService
+    {
+        return $getShared ? static::getSharedInstance('emailCode') : new EmailCodeService();
+    }
+
+    public static function duo(bool $getShared = true): DuoService
+    {
+        return $getShared ? static::getSharedInstance('duo') : new DuoService();
+    }
+
+    public static function mailer(bool $getShared = true): Mailer
+    {
+        if ($getShared) {
+            return static::getSharedInstance('mailer');
+        }
+
+        return new Mailer();
+    }
+
+    public static function passwordReset(bool $getShared = true): PasswordResetService
+    {
+        if ($getShared) {
+            return static::getSharedInstance('passwordReset');
+        }
+
+        return new PasswordResetService();
+    }
+
+    public static function permissions(bool $getShared = true): PermissionService
+    {
+        if ($getShared) {
+            return static::getSharedInstance('permissions');
+        }
+
+        return new PermissionService();
+    }
+}
