@@ -16,7 +16,7 @@
             <?php if (! $rows): ?><tr><td colspan="6" class="text-center text-body-secondary py-5">Nothing logged yet.</td></tr><?php endif; ?>
             <?php foreach ($rows as $r): ?>
                 <tr>
-                    <td data-label="When" class="text-nowrap"><?= esc($r['created_at']) ?></td>
+                    <td data-label="When" class="text-nowrap"><?= esc(local_time($r['created_at'], 'Y-m-d H:i')) ?></td>
                     <td data-label="Who"><?= esc($r['actor'] ?? ($r['actor_id'] ? '#' . $r['actor_id'] : 'System')) ?></td>
                     <td data-label="Action"><code><?= esc($r['action']) ?></code></td>
                     <td data-label="Entity"><?= esc(trim(($r['entity'] ?? '') . ' ' . ($r['entity_id'] ?? ''))) ?></td>

@@ -91,7 +91,7 @@ class Notifications extends BaseController
             $diff < 3600   => floor($diff / 60) . ' min ago',
             $diff < 86400  => floor($diff / 3600) . ' h ago',
             $diff < 604800 => floor($diff / 86400) . ' d ago',
-            default        => date('j M Y', strtotime($datetime)),
+            default        => local_time($datetime, 'j M Y'),
         };
     }
 }

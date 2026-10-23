@@ -46,13 +46,103 @@ if (! function_exists('nav_items')) {
     }
 }
 
-if (! function_exists('nav_active')) {
-    function nav_active(string $url): bool
+if (! function_exists('nav_tree')) {
+    /**
+     * Sidebar entries the user may see, with modules that declare a 'group' folded under one collapsible heading.
+     * Each result is either a plain menu item or ['group' => true, 'label', 'icon', 'order', 'key', 'items' => [...]].
+     *
+     * @return list<array<string, mixed>>
+     */
+    function nav_tree(): array
     {
-        $path = trim(uri_string(), '/');
-        $url  = trim($url, '/');
+        $config = config(Backoffice::class);
+        $tree   = [];
+        $named  = [];
 
-        return $url === '' ? $path === '' : ($path === $url || str_starts_with($path, $url . '/'));
+        foreach ($config->modules as $key => $module) {
+            $own = [];
+
+            foreach ($module['menu'] as $item) {
+                if ($item['permission'] !== null && ! can($item['permission'])) {
+                    continue;
+                }
+
+                if (isset($item['group'], $config->navGroups[$item['group']])) {
+                    $named[$item['group']][] = $item;
+                } else {
+                    $own[] = $item;
+                }
+            }
+
+            if ($own === []) {
+                continue;
+            }
+
+            usort($own, static fn ($a, $b) => $a['order'] <=> $b['order']);
+
+            if (isset($module['group'])) {
+                $tree[] = ['group' => true, 'key' => (string) $key, 'items' => $own] + $module['group'];
+            } else {
+                array_push($tree, ...$own);
+            }
+        }
+
+        foreach ($named as $key => $items) {
+            usort($items, static fn ($a, $b) => $a['order'] <=> $b['order']);
+            $tree[] = ['group' => true, 'key' => (string) $key, 'items' => $items] + $config->navGroups[$key];
+        }
+
+        usort($tree, static fn ($a, $b) => $a['order'] <=> $b['order']);
+
+        return $tree;
+    }
+}
+if (! function_exists('nav_badge')) {
+    /**
+     * Count shown beside a sidebar entry (menu item key 'badge'). Modules register their counters here.
+     */
+    function nav_badge(?string $key): int
+    {
+        $uid = (int) auth()->id();
+
+        return match ($key) {
+            'invoices.waiting' => $uid > 0 ? \App\Core\Invoices\NavCounts::for($uid)['waiting'] : 0,
+            default => 0,
+        };
+    }
+}
+
+if (! function_exists('nav_active')) {
+    /**
+     * @param string                  $url   menu url, optionally with a query (invoices?status=draft)
+     * @param string|null             $unless GET param that makes a plain entry inactive when present
+     * @param array<string, mixed>|null $get  request query, defaults to the current one
+     */
+    function nav_active(string $url, ?string $unless = null, ?string $currentPath = null, ?array $get = null): bool
+    {
+        $path = trim($currentPath ?? uri_string(), '/');
+        $get ??= service('request')->getGet() ?? [];
+
+        [$url, $query] = array_pad(explode('?', $url, 2), 2, '');
+        $url           = trim($url, '/');
+
+        $match = $url === '' ? $path === '' : ($path === $url || str_starts_with($path, $url . '/'));
+
+        if (! $match) {
+            return false;
+        }
+
+        if ($query !== '') {
+            parse_str($query, $wanted);
+
+            foreach ($wanted as $k => $v) {
+                if (($get[$k] ?? null) !== $v) {
+                    return false;
+                }
+            }
+        }
+
+        return $unless === null || ! isset($get[$unless]) || $get[$unless] === '';
     }
 }
 
@@ -132,5 +222,37 @@ if (! function_exists('avatar')) {
         }
 
         return '<span class="' . esc($class, 'attr') . '">' . esc(initials($name)) . '</span>';
+    }
+}
+
+if (! function_exists('local_time')) {
+    /**
+     * A stored UTC datetime shown in the signed-in user's timezone.
+     */
+    function local_time(?string $utc, string $format = 'j M, H:i'): string
+    {
+        return service('timezone')->toLocal($utc, null, $format);
+    }
+}
+
+if (! function_exists('days_overdue')) {
+    /**
+     * Whole days a due date (a calendar date) has been past, counted on the company's own calendar.
+     */
+    function days_overdue(string $dueDate, int $companyId): int
+    {
+        $today = service('timezone')->todayFor($companyId);
+
+        return max(0, (int) floor((strtotime($today) - strtotime($dueDate)) / 86400) - 1);
+    }
+}
+
+if (! function_exists('tz_label')) {
+    /**
+     * The timezone the signed-in user's times are shown in.
+     */
+    function tz_label(): string
+    {
+        return service('timezone')->forUser(auth()->id() === null ? null : (int) auth()->id());
     }
 }

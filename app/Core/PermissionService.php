@@ -21,6 +21,11 @@ class PermissionService
             return false;
         }
 
+        // A switched-off module owns no permissions, for anyone.
+        if (service('modules')->blocks($permission)) {
+            return false;
+        }
+
         $set = $this->load($userId);
 
         return $set['super'] || in_array($permission, $set['keys'], true);

@@ -1,0 +1,32 @@
+:root {
+    --mg-primary: #1468d4;
+    --mg-primary-dark: #0d4f9f;
+    --mg-sidebar: #10243a;
+    --mg-sidebar-dark: #0b1b2c;
+    --mg-background: #f5f7fa;
+    --mg-surface: #ffffff;
+    --mg-text: #162337;
+    --mg-text-muted: #68778a;
+    --mg-border: #dde4ec;
+    --mg-success: #20a66a;
+    --mg-warning: #f0a51b;
+    --mg-danger: #e34850;
+    --mg-info: #2583e8;
+    --mg-draft: #7a8797;
+    --mg-radius: 8px;
+    --mg-radius-lg: 12px;
+    --mg-shadow: 0 2px 8px rgba(20, 40, 70, 0.06);
+    --mg-sidebar-width: 232px;
+    --mg-topbar-height: 56px;
+
+    --bs-primary: var(--mg-primary);
+    --bs-primary-rgb: 20, 104, 212;
+    --bs-link-color: var(--mg-primary);
+    --bs-link-color-rgb: 20, 104, 212;
+    --bs-link-hover-color: var(--mg-primary-dark);
+    --bs-body-bg: var(--mg-background);
+    --bs-body-color: var(--mg-text);
+    --bs-border-color: var(--mg-border);
+    --bs-border-radius: var(--mg-radius);
+    --bs-border-radius-lg: var(--mg-radius-lg);
+}

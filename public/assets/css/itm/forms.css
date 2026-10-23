@@ -1,0 +1,9 @@
+.form-control, .form-select { border-color: var(--itm-border); border-radius: var(--itm-radius); }
+.form-control:focus, .form-select:focus { border-color: var(--itm-primary); box-shadow: 0 0 0 .2rem rgba(20, 104, 212, .15); }
+.form-control-sm, .form-select-sm { border-radius: var(--itm-radius); }
+.form-select { padding-right: 2.25rem; background-color: var(--itm-surface); }
+.form-control:disabled, .form-select:disabled { background-color: var(--itm-surface-muted); }
+.form-check-input { border-color: #b8c6d8; }
+.form-check-input:checked { background-color: var(--itm-primary); border-color: var(--itm-primary); }
+.form-check-input:focus { border-color: var(--itm-primary); box-shadow: 0 0 0 .2rem rgba(20, 104, 212, .15); }
+.form-label { font-weight: 600; font-size: .82rem; }

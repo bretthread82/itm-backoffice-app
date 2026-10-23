@@ -29,7 +29,7 @@ class RbacSeeder extends Seeder
 
         $permissionIds = array_column($this->db->table('permissions')->get()->getResultArray(), 'id', 'key');
 
-        foreach ($config->systemRoles as $key => $def) {
+        foreach ($config->roleDefinitions() as $key => $def) {
             $role = $this->db->table('roles')->where('key', $key)->get()->getRowArray();
 
             if ($role) {

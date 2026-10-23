@@ -126,3 +126,4 @@ _modules/*
 /phpunit.xml
 
 node_modules/
+/build.json

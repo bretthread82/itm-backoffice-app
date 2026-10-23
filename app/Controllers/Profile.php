@@ -44,6 +44,7 @@ class Profile extends BaseController
             'location'     => 'permit_empty|max_length[120]',
             'bio'          => 'permit_empty|max_length[2000]',
             'theme'        => 'required|in_list[auto,light,dark]',
+            'timezone'     => 'permit_empty|in_list[' . implode(',', \DateTimeZone::listIdentifiers()) . ']',
         ];
 
         if (! $this->validate($rules)) {

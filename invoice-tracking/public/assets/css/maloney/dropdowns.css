@@ -1,0 +1,8 @@
+.dropdown-menu { --bs-dropdown-border-color: var(--mg-border); --bs-dropdown-border-radius: var(--mg-radius-lg); --bs-dropdown-inner-border-radius: calc(var(--mg-radius-lg) - 1px); --bs-dropdown-box-shadow: 0 8px 24px rgba(20, 40, 70, .12); --bs-dropdown-padding-y: .35rem; --bs-dropdown-font-size: .9rem; --bs-dropdown-color: var(--mg-text); --bs-dropdown-link-color: var(--mg-text); --bs-dropdown-link-hover-color: var(--mg-text); --bs-dropdown-link-hover-bg: #eef4fb; --bs-dropdown-link-active-color: var(--mg-primary-dark); --bs-dropdown-link-active-bg: #e0ecfa; --bs-dropdown-divider-bg: var(--mg-border); --bs-dropdown-item-padding-y: .45rem; --bs-dropdown-item-padding-x: .85rem; }
+.dropdown-menu .dropdown-item { border-radius: calc(var(--mg-radius) - 2px); }
+.dropdown-menu:not(.p-0) { --bs-dropdown-padding-x: .35rem; }
+.dropdown-item.active, .dropdown-item:active { font-weight: 600; }
+.dropdown-item.text-danger:hover { background: #fdeced; }
+.dropdown-menu-company { min-width: 15rem; }
+.dropdown-menu-bell { width: min(24rem, 92vw); }
+.dropdown-menu-bell .list-group { max-height: 60vh; overflow-y: auto; }

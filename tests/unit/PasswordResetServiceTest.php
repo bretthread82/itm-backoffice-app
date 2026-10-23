@@ -5,21 +5,12 @@ namespace Tests\Unit;
 use App\Core\Mailer;
 use App\Core\PasswordResetService;
 use App\Core\UserService;
-use App\Database\Seeds\RbacSeeder;
-use CodeIgniter\Test\CIUnitTestCase;
-use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
 use RuntimeException;
+use Tests\Support\DatabaseTestCase;
 
-final class PasswordResetServiceTest extends CIUnitTestCase
+final class PasswordResetServiceTest extends DatabaseTestCase
 {
-    use DatabaseTestTrait;
-
-    protected $migrate   = true;
-    protected $refresh   = true;
-    protected $namespace = null;
-    protected $seed      = RbacSeeder::class;
-
     private Mailer $mailer;
     private PasswordResetService $svc;
 

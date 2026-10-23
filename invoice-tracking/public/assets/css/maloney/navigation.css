@@ -1,0 +1,21 @@
+.mg-brand { padding: 1.1rem 1.1rem .9rem; display: flex; align-items: center; gap: .65rem; color: #fff; text-decoration: none; }
+.mg-brand:hover { color: #fff; }
+.mg-brand-mark { width: 38px; height: 38px; border-radius: 8px; background: var(--mg-primary); display: grid; place-items: center; font-weight: 800; font-size: 1.25rem; color: #fff; flex: none; }
+.mg-brand-text { line-height: 1.05; font-weight: 700; letter-spacing: .04em; font-size: .95rem; }
+.mg-brand-text small { display: block; font-weight: 500; font-size: .62rem; letter-spacing: .12em; opacity: .7; margin-top: 2px; }
+.mg-nav-section { padding: .9rem 1.1rem .3rem; font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: #7f93ab; }
+.mg-nav { list-style: none; margin: 0; padding: 0 .6rem; }
+.mg-nav a { display: flex; align-items: center; gap: .65rem; padding: .5rem .65rem; border-radius: var(--mg-radius); color: #c9d6e5; text-decoration: none; font-size: .9rem; }
+.mg-nav a:hover { background: rgba(255, 255, 255, .07); color: #fff; }
+.mg-nav a.active { background: var(--mg-primary); color: #fff; font-weight: 600; }
+.mg-nav a .bi { width: 1.1rem; text-align: center; opacity: .9; }
+.mg-nav .mg-count { margin-left: auto; min-width: 1.4rem; text-align: center; font-size: .72rem; font-weight: 700; border-radius: 999px; padding: .08rem .45rem; background: var(--mg-danger); color: #fff; }
+.mg-nav .mg-count.warn { background: var(--mg-warning); color: #3a2a00; }
+.mg-sidebar-foot { margin-top: auto; padding: 1rem 1.1rem; font-size: .62rem; letter-spacing: .18em; color: #5f7590; text-transform: uppercase; }
+.mg-version { margin-top: .4rem; letter-spacing: .08em; text-transform: none; color: #7d93ad; }
+.mg-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--mg-sidebar); color: #fff; display: inline-grid; place-items: center; font-weight: 700; font-size: .78rem; flex: none; }
+.mg-avatar.sm { width: 28px; height: 28px; font-size: .68rem; background: #e6edf6; color: var(--mg-primary-dark); }
+.mg-user { display: flex; align-items: center; gap: .55rem; text-decoration: none; color: var(--mg-text); line-height: 1.15; }
+.mg-user small { display: block; color: var(--mg-text-muted); font-size: .72rem; }
+.mg-iconbtn { position: relative; color: var(--mg-text-muted); font-size: 1.2rem; padding: .3rem .5rem; text-decoration: none; }
+.mg-iconbtn:hover { color: var(--mg-text); }

@@ -94,6 +94,10 @@ $isEntra = $isEdit && ($user['source'] ?? '') === 'entra';
                         <label class="form-label" for="location">Location</label>
                         <input class="form-control" id="location" name="location" value="<?= esc($v('location')) ?>" <?= $dis ?>>
                     </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="timezone">Timezone</label>
+                        <?= view('partials/timezone_select', ['id' => 'timezone', 'name' => 'timezone', 'selected' => $v('timezone'), 'blank' => 'Company default']) ?>
+                    </div>
                 </div>
 
                 <?php if (can('users.assign_roles') || ! $isEdit): ?>
@@ -149,6 +153,16 @@ $isEntra = $isEdit && ($user['source'] ?? '') === 'entra';
                 <?php endif; ?>
             </div>
         </div>
+
+        <?php if (can('tenancy.memberships')): ?>
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <h2 class="h6 text-uppercase text-body-secondary">Companies</h2>
+                <p class="small text-body-secondary">Which companies this user belongs to, and whether they can submit or approve for each.</p>
+                <a class="btn btn-sm btn-outline-primary" href="<?= site_url('admin/users/' . $user['user_id'] . '/companies') ?>">Manage company access</a>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if (can('users.edit') && ! $isEntra): ?>
         <div class="card border-0 shadow-sm mb-3">

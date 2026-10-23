@@ -4,24 +4,15 @@ namespace Tests\Support\Mfa;
 
 use App\Core\Mailer;
 use App\Core\UserService;
-use App\Database\Seeds\RbacSeeder;
-use CodeIgniter\Test\CIUnitTestCase;
-use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
+use Tests\Support\DatabaseTestCase;
 
 /**
- * Fresh schema + system roles per test, a capturing fake mailer, and a clean
+ * Clean data + system roles per test, a capturing fake mailer, and a clean
  * settings store (the settings service caches values for the whole process).
  */
-abstract class MfaTestCase extends CIUnitTestCase
+abstract class MfaTestCase extends DatabaseTestCase
 {
-    use DatabaseTestTrait;
-
-    protected $migrate   = true;
-    protected $refresh   = true;
-    protected $namespace = null;
-    protected $seed      = RbacSeeder::class;
-
     protected Mailer $mailer;
 
     /** Feature tests fill the real session with withSession(), so they must not use the mock. */
@@ -50,7 +41,9 @@ abstract class MfaTestCase extends CIUnitTestCase
         };
 
         Services::injectMock('mailer', $this->mailer);
-        foreach (['settings', 'permissions', 'mfa', 'mfaPolicy', 'totp', 'emailCode', 'duo'] as $name) {
+        // Nobody is signed in at the start of a test (a previous test's session and login must not leak).
+        $_SESSION = [];
+        foreach (['auth', 'settings', 'permissions', 'mfa', 'mfaPolicy', 'totp', 'emailCode', 'duo'] as $name) {
             Services::resetSingle($name);
         }
         if ($this->useMockSession) {

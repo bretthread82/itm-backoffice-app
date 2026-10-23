@@ -1,0 +1,19 @@
+body { background: var(--mg-background); color: var(--mg-text); font-size: .925rem; }
+h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -.01em; }
+.btn-primary { --bs-btn-bg: var(--mg-primary); --bs-btn-border-color: var(--mg-primary); --bs-btn-hover-bg: var(--mg-primary-dark); --bs-btn-hover-border-color: var(--mg-primary-dark); --bs-btn-active-bg: var(--mg-primary-dark); --bs-btn-active-border-color: var(--mg-primary-dark); }
+.btn-outline-primary { --bs-btn-color: var(--mg-primary); --bs-btn-border-color: var(--mg-primary); --bs-btn-hover-bg: var(--mg-primary); --bs-btn-hover-border-color: var(--mg-primary); }
+
+/* Shared button shape and focus ring; variants below follow the --mg-* palette. */
+.btn { --bs-btn-font-weight: 600; --bs-btn-border-radius: var(--mg-radius); --bs-btn-focus-shadow-rgb: 20, 104, 212; }
+.btn-sm { --bs-btn-border-radius: var(--mg-radius); }
+.btn-outline-secondary { --bs-btn-color: var(--mg-text); --bs-btn-border-color: var(--mg-border); --bs-btn-bg: var(--mg-surface); --bs-btn-hover-color: var(--mg-text); --bs-btn-hover-bg: #eef2f7; --bs-btn-hover-border-color: #c9d3df; --bs-btn-active-color: var(--mg-text); --bs-btn-active-bg: #e4eaf2; --bs-btn-active-border-color: #c9d3df; --bs-btn-disabled-color: var(--mg-text-muted); --bs-btn-disabled-border-color: var(--mg-border); }
+.btn-light { --bs-btn-color: var(--mg-text); --bs-btn-bg: transparent; --bs-btn-border-color: transparent; --bs-btn-hover-color: var(--mg-text); --bs-btn-hover-bg: #e8eef6; --bs-btn-hover-border-color: transparent; --bs-btn-active-color: var(--mg-text); --bs-btn-active-bg: #dde6f1; --bs-btn-active-border-color: transparent; }
+.btn-success { --bs-btn-bg: var(--mg-success); --bs-btn-border-color: var(--mg-success); --bs-btn-hover-bg: #1a8c58; --bs-btn-hover-border-color: #1a8c58; --bs-btn-active-bg: #1a8c58; --bs-btn-active-border-color: #1a8c58; --bs-btn-focus-shadow-rgb: 32, 166, 106; }
+.btn-warning { --bs-btn-bg: var(--mg-warning); --bs-btn-border-color: var(--mg-warning); --bs-btn-hover-bg: #d98f0a; --bs-btn-hover-border-color: #d98f0a; --bs-btn-active-bg: #d98f0a; --bs-btn-active-border-color: #d98f0a; --bs-btn-focus-shadow-rgb: 240, 165, 27; }
+.btn-danger { --bs-btn-bg: var(--mg-danger); --bs-btn-border-color: var(--mg-danger); --bs-btn-hover-bg: #c93840; --bs-btn-hover-border-color: #c93840; --bs-btn-active-bg: #c93840; --bs-btn-active-border-color: #c93840; --bs-btn-focus-shadow-rgb: 227, 72, 80; }
+.btn-outline-danger { --bs-btn-color: var(--mg-danger); --bs-btn-border-color: var(--mg-danger); --bs-btn-hover-bg: var(--mg-danger); --bs-btn-hover-border-color: var(--mg-danger); --bs-btn-active-bg: var(--mg-danger); --bs-btn-active-border-color: var(--mg-danger); --bs-btn-focus-shadow-rgb: 227, 72, 80; }
+.btn-link { --bs-btn-color: var(--mg-primary); --bs-btn-hover-color: var(--mg-primary-dark); --bs-btn-active-color: var(--mg-primary-dark); --bs-btn-focus-shadow-rgb: 20, 104, 212; text-decoration: none; }
+.btn-link:hover { text-decoration: underline; }
+
+/* Larger tap targets on touch screens. */
+@media (pointer: coarse) { .btn, .form-control, .form-select, .dropdown-item { min-height: 44px; } }

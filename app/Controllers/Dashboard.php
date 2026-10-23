@@ -2,21 +2,31 @@
 
 namespace App\Controllers;
 
+use App\Core\Dashboard\DashboardService;
+
+/**
+ * The signed-in user's day: a Today tab plus a tab for each enabled module they can use.
+ */
 class Dashboard extends BaseController
 {
     public function index(): string
     {
-        $db = db_connect();
+        $userId = (int) auth()->id();
+        $board  = new DashboardService();
+        $tabs   = $board->tabsFor($userId);
+        $active = $board->resolve($tabs, $this->request->getGet('tab'));
+        $badges = $board->badges($userId, $tabs);
 
-        $stats = [];
+        $data = $active === DashboardService::TODAY
+            ? ['unread' => $board->unreadNotifications($userId), 'unreadTotal' => service('notifier')->unreadCount($userId)]
+            : $board->data($userId, $tabs[$active]);
 
-        if (can('users.view')) {
-            $stats['active_users'] = $db->table('staff_profiles')->where('status', 'active')->where('deleted_at', null)->countAllResults();
-        }
-
-        $recent = $db->table('notifications')->where('user_id', auth()->id())
-            ->orderBy('created_at', 'DESC')->limit(5)->get()->getResultArray();
-
-        return view('dashboard/index', ['stats' => $stats, 'recent' => $recent, 'title' => 'Dashboard']);
+        return view('dashboard/index', [
+            'title'  => 'Dashboard',
+            'tabs'   => $tabs,
+            'active' => $active,
+            'badges' => $badges,
+            'tab'    => $data,
+        ]);
     }
 }

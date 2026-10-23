@@ -15,7 +15,7 @@ class NotificationService
      * @param int|list<int>        $userIds
      * @param array<string, mixed> $data
      */
-    public function send(int|array $userIds, string $type, string $title, ?string $body = null, ?string $url = null, array $data = []): void
+    public function send(int|array $userIds, string $type, string $title, ?string $body = null, ?string $url = null, array $data = [], bool $forceEmail = false): void
     {
         $db   = db_connect();
         $now  = date('Y-m-d H:i:s');
@@ -35,7 +35,8 @@ class NotificationService
                 ]);
             }
 
-            if ($pref['email']) {
+            // $forceEmail is for urgent notices (e.g. a high-priority invoice) that must reach the inbox whatever the preference.
+            if ($pref['email'] || $forceEmail) {
                 $this->email($userId, $title, $body, $url);
             }
         }

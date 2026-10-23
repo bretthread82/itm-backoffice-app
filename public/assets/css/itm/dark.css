@@ -1,0 +1,34 @@
+/* Dark theme: only the tokens change; components read them. Toggled by data-bs-theme="dark" on <html>. */
+[data-bs-theme="dark"] {
+    --itm-primary: #5b9cf0;
+    --itm-primary-dark: #8ab8f5;
+    --itm-sidebar: #0b1424;
+    --itm-sidebar-dark: #070e1a;
+    --itm-background: #0e1624;
+    --itm-surface: #152033;
+    --itm-text: #e3e9f2;
+    --itm-text-muted: #94a3b8;
+    --itm-border: #26354d;
+    --itm-tint-info: #14304f;
+    --itm-tint-success: #12362a;
+    --itm-tint-warning: #3d3010;
+    --itm-tint-danger: #40191d;
+    --itm-tint-draft: #232f40;
+    --itm-tint-dark: #2a3442;
+    --itm-ink-info: #8ab8f5;
+    --itm-ink-success: #6fd3a3;
+    --itm-ink-warning: #f3c768;
+    --itm-ink-danger: #f08a90;
+    --itm-ink-draft: #aab6c6;
+    --itm-ink-dark: #cbd5e1;
+    --itm-table-head: #1a2740;
+    --itm-row-hover: #1a2740;
+    --itm-surface-muted: #1d2b44;
+    --itm-track: #26354d;
+    --itm-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+    --bs-primary-rgb: 91, 156, 240;
+    --bs-link-color-rgb: 91, 156, 240;
+    --bs-body-bg-rgb: 14, 22, 36;
+}
+[data-bs-theme="dark"] .itm-topbar { background: var(--itm-surface); }
+[data-bs-theme="dark"] .dropdown-menu { background: var(--itm-surface); }

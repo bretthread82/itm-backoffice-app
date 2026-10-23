@@ -49,7 +49,7 @@
                                 <i class="bi bi-<?= $l['success'] ? 'check-circle text-success' : 'x-circle text-danger' ?> me-1"></i>
                                 <?= $l['success'] ? 'Signed in' : 'Failed attempt' ?> · <?= esc($l['ip_address']) ?>
                             </span>
-                            <span class="text-body-secondary"><?= esc(date('j M, H:i', strtotime($l['date']))) ?></span>
+                            <span class="text-body-secondary"><?= esc(local_time($l['date'])) ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>
@@ -64,7 +64,7 @@
                     <?php foreach ($activity as $a): ?>
                         <li class="d-flex justify-content-between py-1">
                             <code><?= esc($a['action']) ?></code>
-                            <span class="text-body-secondary"><?= esc(date('j M, H:i', strtotime($a['created_at']))) ?></span>
+                            <span class="text-body-secondary"><?= esc(local_time($a['created_at'])) ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>

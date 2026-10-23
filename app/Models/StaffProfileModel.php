@@ -15,7 +15,7 @@ class StaffProfileModel extends Model
     protected $allowedFields    = [
         'user_id', 'employee_no', 'first_name', 'last_name', 'display_name', 'job_title',
         'department_id', 'manager_id', 'phone', 'mobile', 'location', 'bio', 'start_date',
-        'avatar_path', 'entra_object_id', 'source', 'status', 'theme',
+        'avatar_path', 'entra_object_id', 'source', 'status', 'theme', 'timezone',
     ];
 
     /**

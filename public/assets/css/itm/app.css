@@ -1,0 +1,41 @@
+/* Module-neutral components shared by every module (tabs, dropzone, profile, directory, notifications). */
+.nav-tabs-itm { border-bottom: 1px solid var(--itm-border); gap: 1.25rem; }
+.nav-tabs-itm .nav-link { border: 0; border-bottom: 2px solid transparent; color: var(--itm-text-muted); font-weight: 600; padding: .6rem .1rem; background: none; }
+.nav-tabs-itm .nav-link.active { color: var(--itm-primary); border-bottom-color: var(--itm-primary); background: none; }
+
+.dropzone { border: 2px dashed var(--itm-border); border-radius: var(--itm-radius-lg); padding: 2rem 1rem; text-align: center; background: var(--itm-surface); cursor: pointer; }
+.dropzone.drag { border-color: var(--itm-primary); background: var(--itm-tint-info); }
+
+.avatar-xl { width: 72px; height: 72px; font-size: 1.5rem; }
+.avatar-img { object-fit: cover; background: var(--bs-secondary-bg); }
+.directory-card { transition: transform .15s ease, box-shadow .15s ease; }
+.directory-card:hover { transform: translateY(-2px); box-shadow: var(--bs-box-shadow) !important; }
+
+.notif-panel { width: 340px; max-width: calc(100vw - 1.5rem); }
+.notif-panel .list-group { max-height: 360px; overflow-y: auto; }
+.notif-unread { background: rgba(var(--bs-primary-rgb), .07); }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: transparent; flex: 0 0 8px; }
+.notif-unread .notif-dot { background: var(--itm-primary); }
+.notif-row:hover { background: var(--bs-tertiary-bg); }
+.itm-iconbtn .badge { position: absolute; top: 0; right: 0; font-size: .6rem; }
+.itm-footer { color: var(--itm-text-muted); font-size: .8rem; padding: 1rem 1.5rem; }
+.w-6rem { width: 6rem; }
+
+/* Stack tables as cards on phones: add .table-stack and data-label on each td (same as .table-cards). */
+@media (max-width: 767.98px) {
+    .table-stack thead { display: none; }
+    .table-stack tr { display: block; margin-bottom: .75rem; border: 1px solid var(--bs-border-color); border-radius: var(--itm-radius); }
+    .table-stack td { display: flex; justify-content: space-between; gap: 1rem; border: 0; padding: .5rem .85rem; }
+    .table-stack td::before { content: attr(data-label); font-weight: 600; color: var(--bs-secondary-color); }
+    .table-stack td[data-label="Name"]::before { display: none; }
+    .table-stack td[data-label="Name"] { justify-content: flex-start; }
+}
+
+/* Pills and tabs follow the brand colour. */
+.page-link { color: var(--itm-primary); }
+.page-item.active .page-link { background-color: var(--itm-primary); border-color: var(--itm-primary); color: #fff; }
+.nav-tabs .nav-link.active { color: var(--itm-primary); }
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: var(--itm-primary); color: #fff; }
+.nav-pills .nav-link:not(.active) { color: var(--itm-primary); }
+
+.avatar { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--itm-sidebar); color: #fff; font-size: .78rem; font-weight: 700; flex: none; }

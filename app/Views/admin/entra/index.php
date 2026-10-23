@@ -117,7 +117,7 @@ $badge = static fn (bool $ok, string $yes, string $no) => '<span class="badge te
                         <?php if (! $runs): ?><tr><td colspan="5" class="text-body-secondary">No syncs have run.</td></tr><?php endif; ?>
                         <?php foreach ($runs as $r): ?>
                             <tr>
-                                <td data-label="Started" class="text-nowrap"><?= esc($r['started_at']) ?></td>
+                                <td data-label="Started" class="text-nowrap"><?= esc(local_time($r['started_at'], 'Y-m-d H:i')) ?></td>
                                 <td data-label="Created"><?= (int) $r['created'] ?></td>
                                 <td data-label="Updated"><?= (int) $r['updated'] ?></td>
                                 <td data-label="Deactivated"><?= (int) $r['deactivated'] ?></td>

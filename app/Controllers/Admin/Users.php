@@ -191,6 +191,7 @@ class Users extends BaseController
             'department_id' => 'permit_empty|is_natural_no_zero',
             'manager_id'    => 'permit_empty|is_natural_no_zero',
             'employee_no'   => 'permit_empty|max_length[30]',
+            'timezone'      => 'permit_empty|in_list[' . implode(',', \DateTimeZone::listIdentifiers()) . ']',
         ];
     }
 

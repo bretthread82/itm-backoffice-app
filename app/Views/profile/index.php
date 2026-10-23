@@ -74,6 +74,11 @@ $hasPending = array_column(array_filter($requests, static fn ($r) => $r['status'
                         <textarea class="form-control" id="bio" name="bio" rows="3" maxlength="2000"><?= esc($v('bio')) ?></textarea>
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label" for="timezone">Timezone</label>
+                        <?= view('partials/timezone_select', ['id' => 'timezone', 'name' => 'timezone', 'selected' => $v('timezone'), 'blank' => 'Company default (' . service('timezone')->companyDefaultFor((int) auth()->id()) . ')']) ?>
+                        <div class="form-text">Times across the app are shown in this timezone.</div>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label" for="theme">Appearance</label>
                         <select class="form-select" id="theme" name="theme">
                             <?php foreach (['auto' => 'Match my device', 'light' => 'Light', 'dark' => 'Dark'] as $k => $label): ?>

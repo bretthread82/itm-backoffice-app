@@ -1,0 +1,12 @@
+/* PDF viewer */
+.pdf-viewer { display: flex; flex-direction: column; background: var(--bs-secondary-bg); border: 1px solid var(--bs-border-color); border-radius: .5rem; overflow: hidden; }
+.pdf-viewer [data-pdf-pages] { overflow: auto; padding: .5rem; height: 70vh; min-height: 320px; -webkit-overflow-scrolling: touch; }
+.pdf-viewer:fullscreen [data-pdf-pages], .pdf-viewer.pdf-expanded [data-pdf-pages] { height: calc(100vh - 52px); }
+.pdf-viewer.pdf-expanded { position: fixed; inset: 0; z-index: 2000; border-radius: 0; }
+.pdf-viewer canvas { display: block; }
+@media (max-width: 991.98px) { .pdf-viewer [data-pdf-pages] { height: 60vh; } }
+
+/* Approve / return / reject bar stays reachable on phones. */
+@media (max-width: 767.98px) { .action-bar { position: sticky; bottom: 0; z-index: 1020; box-shadow: 0 -4px 12px rgba(0, 0, 0, .12); } }
+
+.no-caret::after { display: none; }

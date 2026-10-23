@@ -1,0 +1,4 @@
+.no-caret::after { display: none; }
+
+/* Larger tap targets on touch screens. */
+@media (pointer: coarse) { .btn, .form-control, .form-select, .dropdown-item { min-height: 44px; } }

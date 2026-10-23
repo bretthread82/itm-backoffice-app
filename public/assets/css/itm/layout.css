@@ -1,0 +1,74 @@
+.itm-sidebar {
+    position: fixed; inset: 0 auto 0 0; width: var(--itm-sidebar-width);
+    background: linear-gradient(180deg, var(--itm-sidebar) 0%, var(--itm-sidebar-dark) 100%);
+    color: #c9d6e5; display: flex; flex-direction: column; z-index: 1040; overflow-y: auto;
+    transition: transform .2s ease;
+}
+.itm-main { margin-left: var(--itm-sidebar-width); min-height: 100vh; transition: margin .2s ease; }
+.itm-content { padding: 1.25rem 1.5rem 2rem; }
+.itm-topbar {
+    position: sticky; top: 0; z-index: 1030; height: var(--itm-topbar-height);
+    background: var(--itm-surface); border-bottom: 1px solid var(--itm-border);
+    display: flex; align-items: center; gap: .75rem; padding: 0 1.5rem;
+}
+.itm-search { position: relative; flex: 1 1 auto; max-width: 560px; }
+.itm-search .bi-search { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--itm-text-muted); }
+.itm-search input { padding-left: 2.2rem; padding-right: 3.2rem; background: var(--itm-background); border-color: transparent; }
+.itm-search kbd { position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); font-size: .7rem; background: var(--itm-surface); color: var(--itm-text-muted); border: 1px solid var(--itm-border); }
+.itm-company { display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .7rem; border: 1px solid var(--itm-border); border-radius: var(--itm-radius); background: var(--itm-surface); font-weight: 500; color: var(--itm-text); text-decoration: none; white-space: nowrap; }
+
+/* Collapsed sidebar (desktop toggle) */
+body.itm-collapsed .itm-sidebar { transform: translateX(-100%); }
+body.itm-collapsed .itm-main { margin-left: 0; }
+
+/* Tablet and below: sidebar becomes a drawer */
+@media (max-width: 991.98px) {
+    .itm-sidebar { transform: translateX(-100%); }
+    body.itm-drawer-open .itm-sidebar { transform: none; box-shadow: 0 0 40px rgba(0, 0, 0, .35); }
+    body.itm-drawer-open::after { content: ""; position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 1035; }
+    .itm-main, body.itm-collapsed .itm-main { margin-left: 0; }
+    .itm-topbar, .itm-content { padding-left: 1rem; padding-right: 1rem; }
+}
+.page-header { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.page-header h1 { font-size: 1.45rem; margin: 0; font-weight: 700; }
+.page-header .subtitle { color: var(--itm-text-muted); font-size: .9rem; }
+
+/* Sign-in screens */
+/* Sign-in screens: branded photo under a navy wash so the brand and card stay readable. The plain gradient
+   is the fallback while the picture loads (or if it is blocked). Phones get a smaller file and a scrolling
+   background (fixed backgrounds are unreliable on iOS). */
+.auth-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--itm-sidebar-dark);
+    background-image:
+        linear-gradient(160deg, rgba(16, 36, 58, .45) 0%, rgba(11, 27, 44, .68) 100%),
+        url("../../img/login-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+@media (max-width: 767.98px) {
+    .auth-body {
+        background-image:
+            linear-gradient(160deg, rgba(16, 36, 58, .45) 0%, rgba(11, 27, 44, .68) 100%),
+            url("../../img/login-bg-sm.jpg");
+        background-attachment: scroll;
+    }
+}
+/* "Powered by ITM": the logo is transparent (its text recoloured for dark backgrounds) on a clear frosted-glass badge, so the photo shows through. */
+.auth-footer { margin-top: auto; padding: 1.5rem 1rem 1.25rem; display: flex; justify-content: center; }
+.auth-powered {
+    display: inline-flex; max-width: 100%; padding: .55rem 1.25rem; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .08) 100%);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3);
+    border: 1px solid rgba(255, 255, 255, .38);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+.auth-powered img { display: block; height: 46px; width: auto; max-width: 100%; }
+.auth-brand { display: flex; align-items: center; justify-content: center; gap: .65rem; padding: 2rem 1rem 0; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .55); }
+.auth-brand .itm-brand-mark { width: 44px; height: 44px; border-radius: 10px; background: var(--itm-primary); display: grid; place-items: center; font-weight: 800; font-size: 1.4rem; }
+.auth-brand .itm-brand-text { line-height: 1.05; font-weight: 700; letter-spacing: .04em; }
+.auth-brand .itm-brand-text small { display: block; font-weight: 500; font-size: .62rem; letter-spacing: .12em; opacity: .7; }

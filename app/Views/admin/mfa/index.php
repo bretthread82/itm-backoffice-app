@@ -75,7 +75,7 @@ $meta = [
             <ul class="list-unstyled small mb-0">
                 <?php if (! $events): ?><li class="text-body-secondary">Nothing yet.</li><?php endif; ?>
                 <?php foreach ($events as $e): ?>
-                    <li class="d-flex justify-content-between py-1"><code><?= esc($e['action']) ?></code><span class="text-body-secondary"><?= esc(date('j M H:i', strtotime($e['created_at']))) ?></span></li>
+                    <li class="d-flex justify-content-between py-1"><code><?= esc($e['action']) ?></code><span class="text-body-secondary"><?= esc(local_time($e['created_at'], 'j M H:i')) ?></span></li>
                 <?php endforeach; ?>
             </ul>
         </div></div>

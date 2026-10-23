@@ -42,7 +42,8 @@ class Database extends Config
         'strictOn'     => false,
         'failover'     => [],
         'port'         => 3306,
-        'numberNative' => false,
+        // Integers come back as ints (the invoices module compares ids strictly).
+        'numberNative' => true,
         'foundRows'    => false,
         'dateFormat'   => [
             'date'     => 'Y-m-d',
@@ -183,6 +184,7 @@ class Database extends Config
         'foreignKeys' => true,
         'busyTimeout' => 1000,
         'synchronous' => null,
+        'numberNative' => true,
         'dateFormat'  => [
             'date'     => 'Y-m-d',
             'datetime' => 'Y-m-d H:i:s',

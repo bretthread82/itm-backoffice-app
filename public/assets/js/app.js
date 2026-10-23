@@ -87,3 +87,85 @@ document.addEventListener('submit', function (event) {
         event.preventDefault();
     }
 });
+
+// Shell: sidebar collapse (desktop) / drawer (mobile).
+(function () {
+    'use strict';
+
+    var body = document.body;
+    var toggle = document.getElementById('sidebar-toggle');
+    var wide = window.matchMedia('(min-width: 992px)');
+    if (!toggle) return;
+
+    try { if (localStorage.getItem('itm-collapsed') === '1' && wide.matches) body.classList.add('itm-collapsed'); } catch (e) {}
+
+    toggle.addEventListener('click', function () {
+        if (wide.matches) {
+            var collapsed = body.classList.toggle('itm-collapsed');
+            try { localStorage.setItem('itm-collapsed', collapsed ? '1' : '0'); } catch (e) {}
+        } else {
+            body.classList.toggle('itm-drawer-open');
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (body.classList.contains('itm-drawer-open') && !e.target.closest('#sidebar') && !e.target.closest('#sidebar-toggle')) {
+            body.classList.remove('itm-drawer-open');
+        }
+    });
+})();
+
+// CSP-safe replacements for inline handlers used by modules.
+(function () {
+    'use strict';
+
+    // <button data-confirm-click="Sure?"> asks before the click goes ahead (form submit or link).
+    document.addEventListener('click', function (event) {
+        var el = event.target.closest('[data-confirm-click]');
+        if (el && !window.confirm(el.getAttribute('data-confirm-click'))) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, true);
+
+    // <input data-autosubmit> submits its form when changed.
+    document.addEventListener('change', function (event) {
+        var el = event.target;
+        if (el.matches && el.matches('[data-autosubmit]') && el.form) {
+            el.form.submit();
+        }
+    });
+
+    // <div data-width="42"> is drawn 42% wide (bars); set through the CSSOM, which the CSP allows.
+    document.querySelectorAll('[data-width]').forEach(function (el) {
+        el.style.width = Math.max(0, Math.min(100, parseFloat(el.getAttribute('data-width')) || 0)) + '%';
+    });
+})();
+
+// Sidebar groups: remember which collapsible groups the user opened or closed (the group holding the current page always opens).
+(function () {
+    'use strict';
+
+    var KEY = 'itm-nav-groups';
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+
+    document.querySelectorAll('[data-nav-group]').forEach(function (group) {
+        var name = group.getAttribute('data-nav-group');
+        var panel = group.querySelector('.collapse');
+        var toggle = group.querySelector('[data-bs-toggle="collapse"]');
+        if (!panel || !toggle) return;
+
+        if (saved[name] === true && !panel.classList.contains('show')) {
+            panel.classList.add('show');
+            toggle.setAttribute('aria-expanded', 'true');
+        }
+
+        panel.addEventListener('shown.bs.collapse', function () { saved[name] = true; persist(); });
+        panel.addEventListener('hidden.bs.collapse', function () { saved[name] = false; persist(); });
+    });
+
+    function persist() {
+        try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    }
+})();

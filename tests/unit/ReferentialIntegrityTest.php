@@ -3,22 +3,13 @@
 namespace Tests\Unit;
 
 use App\Core\UserService;
-use App\Database\Seeds\RbacSeeder;
-use CodeIgniter\Test\CIUnitTestCase;
-use CodeIgniter\Test\DatabaseTestTrait;
+use Tests\Support\DatabaseTestCase;
 
 /**
  * Deleting an organisational record must never delete people.
  */
-final class ReferentialIntegrityTest extends CIUnitTestCase
+final class ReferentialIntegrityTest extends DatabaseTestCase
 {
-    use DatabaseTestTrait;
-
-    protected $migrate   = true;
-    protected $refresh   = true;
-    protected $namespace = null;
-    protected $seed      = RbacSeeder::class;
-
     private function person(string $email, array $extra = []): int
     {
         return (new UserService())->create(['email' => $email, 'first_name' => 'A', 'last_name' => 'B'] + $extra, [])['id'];

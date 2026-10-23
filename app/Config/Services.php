@@ -3,7 +3,10 @@
 namespace Config;
 
 use App\Core\AuditService;
+use App\Core\HelpService;
 use App\Core\Mailer;
+use App\Core\SupplierService;
+use App\Core\ModuleService;
 use App\Core\Mfa\DuoService;
 use App\Core\Mfa\EmailCodeService;
 use App\Core\Mfa\MfaPolicy;
@@ -12,6 +15,9 @@ use App\Core\Mfa\TotpService;
 use App\Core\NotificationService;
 use App\Core\PasswordResetService;
 use App\Core\PermissionService;
+use App\Core\Tenancy\AccessScope;
+use App\Core\Tenancy\ActiveCompany;
+use App\Core\Tenancy\Memberships;
 use App\Core\UserService;
 use CodeIgniter\Config\BaseService;
 
@@ -100,6 +106,11 @@ class Services extends BaseService
         return new PasswordResetService();
     }
 
+    public static function help(bool $getShared = true): HelpService
+    {
+        return $getShared ? static::getSharedInstance('help') : new HelpService();
+    }
+
     public static function permissions(bool $getShared = true): PermissionService
     {
         if ($getShared) {
@@ -107,5 +118,48 @@ class Services extends BaseService
         }
 
         return new PermissionService();
+    }
+
+    /**
+     * Where invoice files live (writable/uploads on this server). Tests replace it with Services::injectMock('fileStore', ...).
+     */
+    public static function fileStore(bool $getShared = true): \App\Core\Invoices\Files\FileStore
+    {
+        return $getShared ? static::getSharedInstance('fileStore') : new \App\Core\Invoices\Files\LocalFileStore();
+    }
+
+    public static function suppliers(bool $getShared = true): SupplierService
+    {
+        return $getShared ? static::getSharedInstance('suppliers') : new SupplierService();
+    }
+
+    public static function modules(bool $getShared = true): ModuleService
+    {
+        return $getShared ? static::getSharedInstance('modules') : new ModuleService();
+    }
+
+    public static function versions(bool $getShared = true): \App\Core\VersionService
+    {
+        return $getShared ? static::getSharedInstance('versions') : new \App\Core\VersionService();
+    }
+
+    public static function scope(bool $getShared = true): AccessScope
+    {
+        return $getShared ? static::getSharedInstance('scope') : new AccessScope();
+    }
+
+    public static function activeCompany(bool $getShared = true): ActiveCompany
+    {
+        return $getShared ? static::getSharedInstance('activeCompany') : new ActiveCompany(static::scope());
+    }
+
+    public static function memberships(bool $getShared = true): Memberships
+    {
+        return $getShared ? static::getSharedInstance('memberships') : new Memberships();
+    }
+
+    public static function timezone(bool $getShared = true): \App\Core\Timezone\TimezoneService
+    {
+        return $getShared ? static::getSharedInstance('timezone') : new \App\Core\Timezone\TimezoneService();
     }
 }

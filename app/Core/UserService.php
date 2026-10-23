@@ -309,7 +309,7 @@ class UserService
     private function profileFields(array $data): array
     {
         $allowed = ['employee_no', 'first_name', 'last_name', 'display_name', 'job_title', 'department_id',
-            'manager_id', 'phone', 'mobile', 'location', 'start_date'];
+            'manager_id', 'phone', 'mobile', 'location', 'start_date', 'timezone'];
         $out = [];
 
         foreach ($allowed as $field) {

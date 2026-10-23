@@ -44,6 +44,8 @@
 
     <php>
         <server name="app.baseURL" value="http://example.com/"/>
+        <!-- Cheapest bcrypt cost: tests create many users and a cost of 12 costs ~300 ms each -->
+        <server name="auth.hashCost" value="4"/>
         <server name="CODEIGNITER_SCREAM_DEPRECATIONS" value="0"/>
         <!-- Directory containing phpunit.xml -->
         <const name="HOMEPATH" value="./"/>

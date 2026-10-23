@@ -2,22 +2,21 @@
 $name   = display_name();
 $unread = unread_notification_count();
 ?>
-<header class="app-topbar d-flex align-items-center gap-2 px-3 px-lg-4">
-    <button class="btn btn-link text-body d-lg-none px-1" type="button" data-bs-toggle="offcanvas"
-            data-bs-target="#mobileNav" aria-controls="mobileNav" aria-label="Open menu">
-        <i class="bi bi-list fs-3"></i>
-    </button>
+<header class="itm-topbar">
+    <button class="btn btn-light border-0" type="button" id="sidebar-toggle" aria-label="Toggle menu"><i class="bi bi-list fs-5"></i></button>
+
+    <?= $this->include('partials/company_context') ?>
 
     <div class="ms-auto d-flex align-items-center gap-1">
-        <button class="btn btn-link text-body" type="button" id="themeToggle" aria-label="Toggle dark mode">
+        <button class="itm-iconbtn btn btn-link" type="button" id="themeToggle" aria-label="Toggle dark mode">
             <i class="bi bi-moon-stars"></i>
         </button>
 
         <div class="dropdown" id="notifMenu" data-feed="<?= site_url('notifications/feed') ?>">
-            <button class="btn btn-link text-body position-relative" type="button" data-bs-toggle="dropdown"
+            <button class="itm-iconbtn btn btn-link" type="button" data-bs-toggle="dropdown"
                     data-bs-auto-close="outside" aria-expanded="false" aria-label="Notifications">
                 <i class="bi bi-bell"></i>
-                <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger<?= $unread ? '' : ' d-none' ?>">
+                <span id="notifBadge" class="badge rounded-pill bg-danger<?= $unread ? '' : ' d-none' ?>">
                     <?= $unread > 99 ? '99+' : $unread ?>
                 </span>
             </button>
@@ -32,15 +31,17 @@ $unread = unread_notification_count();
             </div>
         </div>
 
-        <div class="dropdown">
-            <button class="btn btn-link text-body d-flex align-items-center gap-2 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="dropdown ms-1">
+            <a class="itm-user" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                 <?= avatar(current_profile() ?? ['first_name' => $name]) ?>
-                <span class="d-none d-md-inline"><?= esc($name) ?></span>
-            </button>
+                <span class="d-none d-md-block"><?= esc($name) ?></span>
+                <i class="bi bi-chevron-down small d-none d-md-inline"></i>
+            </a>
             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                 <li><a class="dropdown-item" href="<?= site_url('profile') ?>"><i class="bi bi-person me-2"></i>My profile</a></li>
                 <li><a class="dropdown-item" href="<?= site_url('profile/security') ?>"><i class="bi bi-key me-2"></i>Password &amp; security</a></li>
                 <li><a class="dropdown-item" href="<?= site_url('profile/notifications') ?>"><i class="bi bi-bell me-2"></i>Notification settings</a></li>
+                <li><a class="dropdown-item" href="<?= site_url('help') ?>"><i class="bi bi-question-circle me-2"></i>Help</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="<?= site_url('logout') ?>"><i class="bi bi-box-arrow-right me-2"></i>Sign out</a></li>
             </ul>

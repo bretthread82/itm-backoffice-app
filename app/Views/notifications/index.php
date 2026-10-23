@@ -31,7 +31,7 @@
                             <span class="d-block <?= $n['read_at'] ? '' : 'fw-semibold' ?>"><?= esc($n['title']) ?></span>
                             <?php if ($n['body']): ?><span class="d-block small text-body-secondary"><?= esc($n['body']) ?></span><?php endif; ?>
                         </span>
-                        <span class="small text-body-secondary text-nowrap"><?= esc(date('j M, H:i', strtotime($n['created_at']))) ?></span>
+                        <span class="small text-body-secondary text-nowrap"><?= esc(local_time($n['created_at'])) ?></span>
                     </a>
                 </li>
             <?php endforeach; ?>

@@ -3,26 +3,16 @@
 namespace Tests\Support\Entra;
 
 use App\Core\Entra\EntraClient;
-use App\Database\Seeds\RbacSeeder;
 use CodeIgniter\Config\Factories;
-use CodeIgniter\Test\CIUnitTestCase;
-use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Entra;
+use Tests\Support\DatabaseTestCase;
 
 /**
- * Shared setup: fresh schema + system roles, and an Entra config that is
+ * Shared setup: clean data + system roles, and an Entra config that is
  * "ready" with obviously fake values (no network is ever touched).
  */
-abstract class EntraTestCase extends CIUnitTestCase
+abstract class EntraTestCase extends DatabaseTestCase
 {
-    use DatabaseTestTrait;
-
-    protected $migrate     = true;
-    protected $migrateOnce = false;
-    protected $refresh     = true;
-    protected $namespace   = null;
-    protected $seed        = RbacSeeder::class;
-
     public const TENANT = '11111111-1111-1111-1111-111111111111';
     public const CLIENT = '22222222-2222-2222-2222-222222222222';
 
