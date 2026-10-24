@@ -31,7 +31,7 @@ Create two databases (for example `itm_backoffice` and `itm_backoffice_test`) wi
 
 ```bash
 vendor/bin/phpunit               # full suite (about a minute)
-vendor/bin/phpunit tests/Invoices   # one folder; add --filter <name> for one test
+vendor/bin/phpunit tests/Payables   # one folder; add --filter <name> for one test
 ```
 
 ## Modules
@@ -40,18 +40,18 @@ vendor/bin/phpunit tests/Invoices   # one folder; add --filter <name> for one te
 |---|---|---|
 | Core | Users, roles, departments, directory, companies and company access, audit, MFA, Entra, notifications | `users.*`, `roles.manage`, `companies.manage`, `tenancy.*`, `audit.view`, ... |
 | Suppliers (core) | Shared supplier list used by any module; bulk CSV upload | `suppliers.view`, `suppliers.manage` |
-| Invoices | Invoice register, approval workflow (routes, variants, teams, delegations), reports | `invoices.view`, `invoices.reports`, `invoices.manage`, `invoices.workflow` |
+| Payables | Invoice register, approval workflow (routes, variants, teams, delegations), reports | `payables.view`, `payables.reports`, `payables.manage`, `payables.workflow` |
 
 After pulling, run `php spark migrate --all` then `php spark db:seed RbacSeeder` so new tables, permissions and roles exist.
-Give someone access to invoices by adding them to companies (Admin > Users > Manage company access) with the
-submit / approve boxes, and assigning the Invoice User role.
+Give someone access to payables by adding them to companies (Admin > Users > Manage company access) with the
+submit / approve boxes, and assigning the Payables User role.
 
 ## Versions and builds
 
 The platform and each module have a `major.minor.bug` version in `app/Config/Backoffice.php` (shown in Admin > Modules and the sidebar footer).
 
 ```bash
-php spark version:bump invoices minor   # module or "platform"; major | minor | bug
+php spark version:bump payables minor   # module or "platform"; major | minor | bug
 php spark app:build                     # stamp build number, commit and date into build.json (run on each deploy)
 ```
 
@@ -64,7 +64,7 @@ php spark app:build                     # stamp build number, commit and date in
    If users hold rights per company, declare them under `'companyAccess'`; they appear on
    Manage company access and are checked with `service('scope')->can($userId, $companyId, 'module.key')`.
 3. Protect routes with the `can:<permission>` filter, for example
-   `['filter' => 'can:invoices.view']`; use `can('invoices.view')` in views.
+   `['filter' => 'can:payables.view']`; use `can('payables.view')` in views.
 4. Notify users through `service('notifier')->send(...)`, and record changes with
    `service('audit')->log(...)`. Register new notification types in
    `Config\Backoffice::$notificationTypes`.

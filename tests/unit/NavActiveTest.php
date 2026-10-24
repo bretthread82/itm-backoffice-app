@@ -19,21 +19,21 @@ final class NavActiveTest extends CIUnitTestCase
 
     public function testPathOnlyMatchesSubpaths(): void
     {
-        $this->assertTrue(nav_active('invoices', null, 'invoices/12', []));
-        $this->assertFalse(nav_active('invoices', null, 'approvals', []));
+        $this->assertTrue(nav_active('payables', null, 'payables/12', []));
+        $this->assertFalse(nav_active('payables', null, 'approvals', []));
     }
 
     public function testQueryMustMatch(): void
     {
-        $this->assertTrue(nav_active('invoices?status=draft', null, 'invoices', ['status' => 'draft']));
-        $this->assertFalse(nav_active('invoices?status=draft', null, 'invoices', ['status' => 'paid']));
-        $this->assertFalse(nav_active('invoices?status=draft', null, 'invoices', []));
+        $this->assertTrue(nav_active('payables?status=draft', null, 'payables', ['status' => 'draft']));
+        $this->assertFalse(nav_active('payables?status=draft', null, 'payables', ['status' => 'paid']));
+        $this->assertFalse(nav_active('payables?status=draft', null, 'payables', []));
     }
 
     public function testUnlessDeactivatesPlainEntry(): void
     {
-        $this->assertTrue(nav_active('invoices', 'status', 'invoices', []));
-        $this->assertTrue(nav_active('invoices', 'status', 'invoices', ['status' => '']));
-        $this->assertFalse(nav_active('invoices', 'status', 'invoices', ['status' => 'draft']));
+        $this->assertTrue(nav_active('payables', 'status', 'payables', []));
+        $this->assertTrue(nav_active('payables', 'status', 'payables', ['status' => '']));
+        $this->assertFalse(nav_active('payables', 'status', 'payables', ['status' => 'draft']));
     }
 }

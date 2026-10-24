@@ -14,7 +14,20 @@ $link = static function (array $item): string {
         <span class="itm-brand-text">ITM<small>BACK OFFICE</small></span>
     </a>
     <ul class="itm-nav">
+        <?php $section = null; ?>
         <?php foreach (nav_tree() as $entry): ?>
+            <?php
+            $entrySection = $entry['section'] ?? null;
+            if ($entrySection !== $section) {
+                $heading = $entrySection !== null ? (config(\Config\Backoffice::class)->navSections[$entrySection]['label'] ?? null) : null;
+                if ($heading !== null) {
+                    echo '<li class="itm-nav-section itm-nav-section-line" role="presentation">' . esc($heading) . '</li>';
+                } elseif ($section !== null) {
+                    echo '<li class="itm-nav-rule" role="separator"></li>';
+                }
+                $section = $entrySection;
+            }
+            ?>
             <?php if (empty($entry['group'])): ?>
                 <?= $link($entry) ?>
             <?php else: ?>

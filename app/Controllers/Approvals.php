@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Tenancy\AccessScope;
-use App\Core\Invoices\ApprovalQueue;
+use App\Core\Payables\ApprovalQueue;
 
 class Approvals extends BaseController
 {
@@ -15,7 +15,7 @@ class Approvals extends BaseController
         $queue = new ApprovalQueue();
         $group = (new AccessScope())->isGroupLevel($uid);
 
-        return view('invoices/approvals/index', [
+        return view('payables/approvals/index', [
             'title'      => 'Approvals',
             'waiting'    => $queue->pendingFor($uid),
             'mine'       => $queue->mine($uid),

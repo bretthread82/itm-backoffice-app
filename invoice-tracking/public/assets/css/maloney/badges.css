@@ -1,8 +1,0 @@
-.badge-status { display: inline-flex; align-items: center; gap: .35rem; font-weight: 600; font-size: .74rem; padding: .28rem .6rem; border-radius: 999px; white-space: nowrap; }
-.badge-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.badge-status.st-info { background: #e6f0fd; color: #1a62c0; }
-.badge-status.st-success { background: #e3f6ed; color: #137a4c; }
-.badge-status.st-warning { background: #fdf3dc; color: #9a6400; }
-.badge-status.st-danger { background: #fdeaeb; color: #b8272f; }
-.badge-status.st-draft { background: #eef1f5; color: #566475; }
-.badge-status.st-dark { background: #dfe3e8; color: #2c3640; }

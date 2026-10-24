@@ -49,10 +49,10 @@ final class ModuleRolesTest extends CIUnitTestCase
     {
         $roles = $this->config->roleDefinitions();
 
-        $this->assertEqualsCanonicalizing(['invoices.view', 'invoices.reports', 'suppliers.view'], $roles['invoice_user']['permissions']);
-        $this->assertEmpty(array_diff($roles['invoice_user']['permissions'], $roles['invoice_workflow']['permissions']));
-        $this->assertContains('invoices.workflow', $roles['invoice_workflow']['permissions']);
-        $this->assertNotContains('invoices.workflow', $roles['invoice_user']['permissions']);
+        $this->assertEqualsCanonicalizing(['payables.view', 'payables.reports', 'suppliers.view'], $roles['payables_user']['permissions']);
+        $this->assertEmpty(array_diff($roles['payables_user']['permissions'], $roles['payables_workflow']['permissions']));
+        $this->assertContains('payables.workflow', $roles['payables_workflow']['permissions']);
+        $this->assertNotContains('payables.workflow', $roles['payables_user']['permissions']);
 
         $this->assertSame(['directory.view'], $roles['directory_user']['permissions']);
         $this->assertContains('directory.view', $roles['directory_manager']['permissions']);

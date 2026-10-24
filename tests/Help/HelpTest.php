@@ -34,9 +34,9 @@ final class HelpTest extends MfaTestCase
         return $this->makeUser('staff@example.test', [$this->roleId('staff')]);
     }
 
-    private function invoiceUser(): int
+    private function payablesUser(): int
     {
-        return $this->makeUser('inv@example.test', [$this->roleId('invoice_user')]);
+        return $this->makeUser('inv@example.test', [$this->roleId('payables_user')]);
     }
 
     /** @return list<string> */
@@ -52,37 +52,37 @@ final class HelpTest extends MfaTestCase
         $this->assertContains('getting-started', $slugs);
         $this->assertContains('my-account', $slugs);
         $this->assertContains('directory', $slugs);
-        $this->assertNotContains('invoices', $slugs);
+        $this->assertNotContains('payables', $slugs);
         $this->assertNotContains('admin-users', $slugs);
         $this->assertNotContains('admin-security', $slugs);
     }
 
-    public function testInvoiceUsersGetInvoiceHelpButNotSetupOrAdmin(): void
+    public function testPayablesUsersGetPayablesHelpButNotSetupOrAdmin(): void
     {
-        $slugs = $this->slugs($this->invoiceUser());
+        $slugs = $this->slugs($this->payablesUser());
 
-        $this->assertContains('invoices', $slugs);
-        $this->assertContains('invoice-reports', $slugs);
-        $this->assertNotContains('invoice-setup', $slugs);
+        $this->assertContains('payables', $slugs);
+        $this->assertContains('payables-reports', $slugs);
+        $this->assertNotContains('payables-setup', $slugs);
         $this->assertNotContains('suppliers', $slugs);
         $this->assertNotContains('admin-access', $slugs);
     }
 
     public function testSectionsAndFaqsAreFilteredInsideATopic(): void
     {
-        // A custom role that can maintain routes but not teams (teams need invoices.manage).
+        // A custom role that can maintain routes but not teams (teams need payables.manage).
         $db = db_connect();
         $db->table('roles')->insert(['key' => 'routes_only', 'name' => 'Routes only', 'description' => '', 'is_system' => 0, 'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')]);
         $roleId = (int) $db->insertID();
-        $perm   = (int) $db->table('permissions')->where('key', 'invoices.workflow')->get()->getRow('id');
+        $perm   = (int) $db->table('permissions')->where('key', 'payables.workflow')->get()->getRow('id');
         $db->table('role_permissions')->insert(['role_id' => $roleId, 'permission_id' => $perm]);
 
         $workflow = $this->makeUser('wf@example.test', [$roleId]);
-        $topic    = service('help')->topic($workflow, 'invoice-setup');
+        $topic    = service('help')->topic($workflow, 'payables-setup');
 
         $headings = array_column($topic['sections'], 'heading');
         $this->assertContains('Approval routes', $headings);
-        $this->assertNotContains('Teams', $headings, 'Teams need invoices.manage.');
+        $this->assertNotContains('Teams', $headings, 'Teams need payables.manage.');
 
         $questions = array_column($topic['faqs'], 'q');
         $this->assertNotContains('Someone has left. Who deals with their invoices?', $questions);
@@ -90,8 +90,8 @@ final class HelpTest extends MfaTestCase
 
     public function testInvoicesManagerSeesTeamsHelpToo(): void
     {
-        $manager = $this->makeUser('mgr@example.test', [$this->roleId('invoice_workflow')]);
-        $topic   = service('help')->topic($manager, 'invoice-setup');
+        $manager = $this->makeUser('mgr@example.test', [$this->roleId('payables_workflow')]);
+        $topic   = service('help')->topic($manager, 'payables-setup');
 
         $this->assertContains('Teams', array_column($topic['sections'], 'heading'));
     }
@@ -107,12 +107,12 @@ final class HelpTest extends MfaTestCase
     public function testASwitchedOffModuleRemovesItsHelp(): void
     {
         $super = $this->makeSuperUser('super@example.test');
-        service('modules')->setEnabled('invoices', false);
+        service('modules')->setEnabled('payables', false);
         Services::resetSingle('modules');
 
         $slugs = $this->slugs($super);
-        $this->assertNotContains('invoices', $slugs);
-        $this->assertNotContains('invoice-reports', $slugs);
+        $this->assertNotContains('payables', $slugs);
+        $this->assertNotContains('payables-reports', $slugs);
         $this->assertContains('admin-users', $slugs);
     }
 
@@ -125,7 +125,7 @@ final class HelpTest extends MfaTestCase
         $this->assertSame([], service('help')->search($staff, '   '));
 
         $groups = array_column(service('help')->faqGroups($staff), 'slug');
-        $this->assertNotContains('invoices', $groups);
+        $this->assertNotContains('payables', $groups);
         $this->assertContains('my-account', $groups);
     }
 
@@ -149,7 +149,7 @@ final class HelpTest extends MfaTestCase
     {
         $uid = $this->staff();
 
-        foreach (['help/invoices', 'help/no-such-topic'] as $path) {
+        foreach (['help/payables', 'help/no-such-topic'] as $path) {
             try {
                 $this->as($uid, $path);
                 $this->fail("GET /{$path} should be not found.");
@@ -161,9 +161,9 @@ final class HelpTest extends MfaTestCase
 
     public function testScreensRenderForAPermittedUser(): void
     {
-        $uid = $this->invoiceUser();
+        $uid = $this->payablesUser();
 
-        foreach (['help' => 'Invoices', 'help/invoices' => 'How an invoice moves', 'help/faq' => 'My invoice was returned', 'help?q=delegat' => 'Delegating while you are away'] as $path => $text) {
+        foreach (['help' => 'Payables', 'help/payables' => 'How an invoice moves', 'help/faq' => 'My invoice was returned', 'help?q=delegat' => 'Delegating while you are away'] as $path => $text) {
             $result = $this->as($uid, $path);
             $this->assertTrue($result->isOK(), "GET /{$path} returned " . $result->response()->getStatusCode());
             $result->assertSee($text);

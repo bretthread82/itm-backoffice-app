@@ -4,6 +4,8 @@
 .itm-brand-text { line-height: 1.05; font-weight: 700; letter-spacing: .04em; font-size: .95rem; }
 .itm-brand-text small { display: block; font-weight: 500; font-size: .62rem; letter-spacing: .12em; opacity: .7; margin-top: 2px; }
 .itm-nav-section { padding: .9rem 1.1rem .3rem; font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: #7f93ab; }
+.itm-nav-section-line { margin: .6rem -.6rem 0; padding-top: .8rem; border-top: 1px solid rgba(255, 255, 255, .12); }
+.itm-nav-rule { margin: .4rem -.6rem; border-top: 1px solid rgba(255, 255, 255, .12); }
 .itm-nav { list-style: none; margin: 0; padding: 0 .6rem; }
 .itm-nav a { display: flex; align-items: center; gap: .65rem; padding: .5rem .65rem; border-radius: var(--itm-radius); color: #c9d6e5; text-decoration: none; font-size: .9rem; }
 .itm-nav a:hover { background: rgba(255, 255, 255, .07); color: #fff; }

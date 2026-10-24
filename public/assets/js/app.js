@@ -31,10 +31,35 @@
     var feedUrl = menu.dataset.feed;
     var badge = document.getElementById('notifBadge');
     var list = document.getElementById('notifList');
+    var readAll = document.getElementById('notifReadAll');
+    var csrfHeader = menu.dataset.csrfHeader;
+    var csrf = '';
 
     function setBadge(count) {
         badge.textContent = count > 99 ? '99+' : String(count);
         badge.classList.toggle('d-none', count < 1);
+        if (readAll) readAll.disabled = count < 1;
+    }
+
+    // POST to a mark-read route; the CSRF token rotates, so keep the one each response returns.
+    function post(url, done) {
+        var headers = { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
+        headers[csrfHeader] = csrf;
+        fetch(url, { method: 'POST', headers: headers, credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                if (!data) return;
+                csrf = data.csrf;
+                setBadge(data.count);
+                done();
+            })
+            .catch(function () {});
+    }
+
+    if (readAll) {
+        readAll.addEventListener('click', function () {
+            post(readAll.dataset.url, function () { load(true); });
+        });
     }
 
     function render(items) {
@@ -58,7 +83,27 @@
             m.textContent = n.ago;
             a.appendChild(t);
             a.appendChild(m);
-            list.appendChild(a);
+
+            if (!n.unread) {
+                list.appendChild(a);
+                return;
+            }
+
+            var wrap = document.createElement('div');
+            wrap.className = 'd-flex align-items-center list-group-item p-0 notif-unread';
+            a.className = 'list-group-item list-group-item-action border-0 flex-fill bg-transparent';
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'btn btn-sm btn-link me-1';
+            b.title = 'Mark as read';
+            b.setAttribute('aria-label', 'Mark as read');
+            b.innerHTML = '<i class="bi bi-check2"></i>';
+            b.addEventListener('click', function () {
+                post(n.read, function () { load(true); });
+            });
+            wrap.appendChild(a);
+            wrap.appendChild(b);
+            list.appendChild(wrap);
         });
     }
 
@@ -67,6 +112,7 @@
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (data) {
                 if (!data) return;
+                csrf = data.csrf;
                 setBadge(data.count);
                 if (withList) render(data.items);
             })

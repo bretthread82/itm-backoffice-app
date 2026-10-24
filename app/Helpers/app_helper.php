@@ -88,6 +88,11 @@ if (! function_exists('nav_tree')) {
         }
 
         foreach ($named as $key => $items) {
+            // Groups kept off the sidebar (Administration) live on their own page instead.
+            if (($config->navGroups[$key]['sidebar'] ?? true) === false) {
+                continue;
+            }
+
             usort($items, static fn ($a, $b) => $a['order'] <=> $b['order']);
             $tree[] = ['group' => true, 'key' => (string) $key, 'items' => $items] + $config->navGroups[$key];
         }
@@ -95,6 +100,63 @@ if (! function_exists('nav_tree')) {
         usort($tree, static fn ($a, $b) => $a['order'] <=> $b['order']);
 
         return $tree;
+    }
+}
+
+if (! function_exists('admin_tree')) {
+    /**
+     * Administration options the user may use, by section, for the Admin dashboard. Sections with nothing visible are
+     * left out; items without a known section go under "Other". Visibility is the same can() check as the sidebar,
+     * so a switched-off module's options disappear too.
+     *
+     * @return array<string, array{label: string, icon: string, order: int, items: list<array<string, mixed>>}>
+     */
+    function admin_tree(): array
+    {
+        $config   = config(Backoffice::class);
+        $sections = [];
+
+        foreach ($config->modules as $module) {
+            foreach ($module['menu'] as $item) {
+                if (($item['group'] ?? null) !== 'admin' || ($item['permission'] !== null && ! can($item['permission']))) {
+                    continue;
+                }
+
+                $key = isset($config->adminSections[$item['section'] ?? '']) ? $item['section'] : 'other';
+
+                $sections[$key] ??= ($config->adminSections[$key] ?? ['label' => 'Other', 'icon' => 'three-dots', 'order' => 999]) + ['items' => []];
+                $sections[$key]['items'][] = $item;
+            }
+        }
+
+        foreach ($sections as &$section) {
+            usort($section['items'], static fn ($a, $b) => $a['order'] <=> $b['order']);
+        }
+
+        unset($section);
+        uasort($sections, static fn ($a, $b) => $a['order'] <=> $b['order']);
+
+        return $sections;
+    }
+}
+
+if (! function_exists('admin_entry_for')) {
+    /**
+     * The Administration option a page belongs to (so admin pages can link back to the Admin dashboard), or null.
+     *
+     * @return array<string, mixed>|null
+     */
+    function admin_entry_for(?string $path = null): ?array
+    {
+        foreach (admin_tree() as $section) {
+            foreach ($section['items'] as $item) {
+                if (nav_active($item['url'], null, $path, [])) {
+                    return $item;
+                }
+            }
+        }
+
+        return null;
     }
 }
 if (! function_exists('nav_badge')) {
@@ -106,7 +168,8 @@ if (! function_exists('nav_badge')) {
         $uid = (int) auth()->id();
 
         return match ($key) {
-            'invoices.waiting' => $uid > 0 ? \App\Core\Invoices\NavCounts::for($uid)['waiting'] : 0,
+            'payables.waiting' => $uid > 0 ? \App\Core\Payables\NavCounts::for($uid)['waiting'] : 0,
+            'receivables.waiting' => $uid > 0 ? \App\Core\Receivables\ArNavCounts::for($uid)['waiting'] : 0,
             default => 0,
         };
     }
@@ -114,7 +177,7 @@ if (! function_exists('nav_badge')) {
 
 if (! function_exists('nav_active')) {
     /**
-     * @param string                  $url   menu url, optionally with a query (invoices?status=draft)
+     * @param string                  $url   menu url, optionally with a query (payables?status=draft)
      * @param string|null             $unless GET param that makes a plain entry inactive when present
      * @param array<string, mixed>|null $get  request query, defaults to the current one
      */

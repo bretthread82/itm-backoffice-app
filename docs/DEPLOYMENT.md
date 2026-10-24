@@ -105,12 +105,47 @@ Recommended PHP settings (`php.ini` for FPM): `expose_php=Off`, `display_errors=
 
 ## 5. Scheduled work (cron)
 
+Every job below reports its own start and end, and **Admin > Cron jobs** (administrators only) shows whether each one is running on time, how its last run ended, and the crontab lines to install. Add the `cron:check` line as well: it alerts administrators (in the app and by email) when a job fails, is late or hangs, and prunes run history older than 90 days. The app cannot see the server's crontab, so it judges a job by whether it has reported in; if cron stops completely the page shows a warning once the hourly check goes missing, but no alert can be sent.
+
+```cron
+5 * * * * www-data cd /var/www/itm-backoffice && php spark cron:check >> writable/logs/cron-check.log 2>&1
+```
+
 Entra directory sync (only does anything once Entra is enabled and configured; it exits
 cleanly otherwise). Run as the web user:
 
 ```cron
 # /etc/cron.d/itm-backoffice
 0 */4 * * * www-data cd /var/www/itm-backoffice && php spark entra:sync >> writable/logs/entra-sync.log 2>&1
+```
+
+Overdue customer invoice reminders (Receivables). It exits cleanly while the module is switched off, and is safe to
+run more than once a day: each invoice is reminded the day after its due date and then every
+`ReceivablesSettings.remindEveryDays` days (default 7) until it is paid. "Today" is each invoice's own company calendar,
+so one run per day, late enough that every company's date has rolled over, is enough. Add `--dry-run` to see what would be sent.
+
+```cron
+30 6 * * * www-data cd /var/www/itm-backoffice && php spark receivables:remind >> writable/logs/receivables-remind.log 2>&1
+```
+
+Customer subscriptions (Receivables). `receivables:subscriptions` raises a draft customer invoice for every active
+subscription whose bill date has arrived, and notifies the owner and collectors ahead of time (days set by
+`ReceivablesSettings.subscriptionLeadDays`, default `14,7,1`). It exits cleanly while the module is switched off, takes a
+lock, and is safe to run more than once a day: a cycle is billed once and a notice sent once. Run it once a day, after
+`receivables:remind`. Add `--dry-run` to see what would happen.
+
+```cron
+45 6 * * * www-data cd /var/www/itm-backoffice && php spark receivables:subscriptions >> writable/logs/receivables-subscriptions.log 2>&1
+```
+
+Database backups. `backup:run` dumps the database, encrypts it and sends it to every destination switched on in
+**Admin > Backups**; it takes a lock, so overlapping runs are impossible, and it exits cleanly if nothing is set up.
+`backup:check` warns the backup managers when no good backup has been made within `backups.staleHours` (default 26),
+which also catches cron itself stopping. See section 8 for setup.
+
+```cron
+0 2 * * * www-data cd /var/www/itm-backoffice && php spark backup:run >> writable/logs/backup.log 2>&1
+15 * * * * www-data cd /var/www/itm-backoffice && php spark backup:check >> writable/logs/backup.log 2>&1
 ```
 
 There is no queue worker: notification emails are sent inline. If a worker is added later,
@@ -168,7 +203,45 @@ remembered (0 = always ask).
 - Duo fails **closed**: if Duo cannot be reached the user is not let through, so keep another
   method (or an administrator who can reset) available.
 
-## 8. Upgrading
+## 8. Database backups
+
+Admins and backup managers see status at **Admin > Backups**; managers also add destinations and press **Run now**.
+
+Setup:
+1. Install the MySQL client tools so `mysqldump` exists on the server (`apt install mysql-client`), or set
+   `backups.mysqldumpPath` in `.env`. The database user needs `SELECT`, `SHOW VIEW`, `TRIGGER`, `EVENT`, `LOCK TABLES`
+   (and `PROCESS` is not required; `--no-tablespaces` is used).
+2. Generate a long random passphrase (`openssl rand -base64 32`), put it in `.env` as `backups.passphrase`, and **store a
+   copy off the server** (password manager, safe). It is separate from `encryption.key`. A backup cannot be restored
+   without it, and it is not stored anywhere in the app.
+3. Make sure `writable/backups/` is writable by the cron user (or set `backups.workDir`). The newest `backups.localKeep`
+   encrypted copies stay there.
+4. Add destinations in the app and press **Test** on each. Types: SharePoint / OneDrive (Microsoft Graph: its own app
+   registration with the application permission `Files.ReadWrite.All`, or `Sites.Selected` for one site, admin consent
+   granted), S3-compatible bucket (give the key write access to one bucket only; turn on versioning or object lock),
+   WebDAV, and a folder or mounted share.
+5. Add the cron lines from section 5.
+
+Notes:
+- Destination passwords and keys are stored encrypted with `encryption.key`. **Back up `encryption.key` too** (see
+  section 7): restoring the database onto a new server without it leaves destinations unreadable, and they must be
+  re-entered.
+- Files are named `itm-backup-YYYYMMDD-HHMMSS.sql.gz.enc`. Only files with that name pattern are ever pruned at a
+  destination, so it is safe to share a folder, but give it its own folder anyway.
+- A run is **Success** (every destination received it), **Partly sent**, or **Failed**. Failures and partial runs notify
+  everyone with `backups.manage` in the app, and by email.
+- `php spark backup:run --dry-run` checks the setup without making a backup. `--destination ID` sends to one destination.
+
+Restoring:
+
+```bash
+php spark backup:decrypt /path/itm-backup-20261023-020000.sql.gz.enc /tmp/restore.sql.gz   # asks for the passphrase if it is not in .env
+gunzip -c /tmp/restore.sql.gz | mysql -u USER -p DATABASE
+```
+
+Practise a restore into a scratch database before you need one. Remove the decrypted file afterwards.
+
+## 9. Upgrading
 
 ```bash
 cd /var/www/itm-backoffice
@@ -182,7 +255,7 @@ sudo systemctl reload php8.3-fpm
 
 Take a database backup first (`mysqldump --single-transaction itm_backoffice > backup.sql`).
 
-## 9. Operational notes and known limits
+## 10. Operational notes and known limits
 
 - **Passwords:** administrators create users and issue one-time passwords (users must change
   them at first sign-in). Users can reset a forgotten password themselves from the sign-in page
@@ -207,7 +280,7 @@ Take a database backup first (`mysqldump --single-transaction itm_backoffice > b
 - **Content-Security-Policy** is enforced. Any new page must avoid inline `<script>`, inline
   event handlers (`onclick=`) and `style=` attributes; use files under `public/assets/js`.
 
-## 10. Verifying a deployment
+## 11. Verifying a deployment
 
 1. `https://your-host/` redirects to the sign-in page; `http://` redirects to `https://`.
 2. `https://your-host/.env`, `/app/Config/App.php` and `/writable/` return 403/404.

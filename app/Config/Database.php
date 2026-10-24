@@ -42,7 +42,7 @@ class Database extends Config
         'strictOn'     => false,
         'failover'     => [],
         'port'         => 3306,
-        // Integers come back as ints (the invoices module compares ids strictly).
+        // Integers come back as ints (the payables module compares ids strictly).
         'numberNative' => true,
         'foundRows'    => false,
         'dateFormat'   => [

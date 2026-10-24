@@ -7,7 +7,7 @@ namespace Config;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * Defaults for the invoices module. Saved values (CodeIgniter Settings) override these.
+ * Defaults for the payables module. Saved values (CodeIgniter Settings) override these.
  */
 class InvoiceSettings extends BaseConfig
 {

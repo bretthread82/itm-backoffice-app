@@ -18,10 +18,34 @@ class Backoffice extends BaseConfig
      * Named sidebar groups shared across modules. A menu item joins one with 'group' => '<key>'.
      * (A module can also fold all its own items under one heading with a module-level 'group' array.)
      *
-     * @var array<string, array{label: string, icon: string, order: int}>
+     * @var array<string, array{label: string, icon: string, order: int, sidebar?: bool}>
      */
     public array $navGroups = [
-        'admin' => ['label' => 'Administration', 'icon' => 'gear', 'order' => 80],
+        'admin' => ['label' => 'Administration', 'icon' => 'gear', 'order' => 80, 'sidebar' => false],
+    ];
+
+    /**
+     * Headings in the sidebar that sit above a run of module groups, with a line separator. A module joins one with
+     * 'section' => '<key>' inside its module-level 'group' array; sections are placed by the groups' 'order'.
+     *
+     * @var array<string, array{label: string}>
+     */
+    public array $navSections = [
+        'accounts' => ['label' => 'Accounts'],
+    ];
+
+    /**
+     * Headings on the Admin dashboard (account menu > Administration). An admin menu item joins one with
+     * 'section' => '<key>' and may add a one-line 'summary'; an item without a known section is listed under Other.
+     *
+     * @var array<string, array{label: string, icon: string, order: int}>
+     */
+    public array $adminSections = [
+        'people'      => ['label' => 'People and access', 'icon' => 'people', 'order' => 10],
+        'payables'    => ['label' => 'Payables', 'icon' => 'receipt', 'order' => 20],
+        'receivables' => ['label' => 'Customer invoices', 'icon' => 'cash-coin', 'order' => 30],
+        'data'        => ['label' => 'Shared data', 'icon' => 'database', 'order' => 40],
+        'system'      => ['label' => 'System', 'icon' => 'gear', 'order' => 50],
     ];
 
     /**
@@ -33,18 +57,21 @@ class Backoffice extends BaseConfig
      * Platform version (major.minor.bug). Bump with `php spark version:bump platform <major|minor|bug>`.
      * Each module below carries its own 'version' in the same format.
      */
-    public string $platformVersion = '1.3.0';
+    public string $platformVersion = '1.13.0';
 
     /**
      * A module that needs per-user, per-company rights declares them in 'companyAccess'
      * (key => ['label', 'help', optional legacy 'column']); they appear on Manage company access
      * and are checked with service('scope')->can($userId, $companyId, '<module>.<key>').
      *
-     * @var array<string, array{version: string, roles?: array<string, array{name: string, description: string, permissions: list<string>, key?: string}>, permissions: array<string, string>, menu: list<array<string, mixed>>, companyAccess?: array<string, array{label: string, help?: string, column?: string}>, optional?: bool, title?: string, description?: string, dashboard?: array{label: string, icon: string, permission: string, order: int, provider: class-string}}>
+     * A module that references customers may declare 'customerUsage' (alias => SQL counting uses of one customer,
+     * with {id} for the customer id); Admin > Customers shows it while the module is on.
+     *
+     * @var array<string, array{version: string, roles?: array<string, array{name: string, description: string, permissions: list<string>, key?: string}>, permissions: array<string, string>, menu: list<array<string, mixed>>, companyAccess?: array<string, array{label: string, help?: string, column?: string}>, customerUsage?: array<string, string>, optional?: bool, title?: string, description?: string, dashboard?: array{label: string, icon: string, permission: string, order: int, provider: class-string}}>
      */
     public array $modules = [
         'core' => [
-            'version'     => '1.3.0',
+            'version'     => '1.4.0',
             'permissions' => [],
             'menu'        => [
                 ['label' => 'Dashboard', 'icon' => 'speedometer2', 'url' => '/', 'permission' => null, 'order' => 10],
@@ -73,7 +100,7 @@ class Backoffice extends BaseConfig
             ],
             'menu' => [
                 ['label' => 'Directory', 'icon' => 'person-lines-fill', 'url' => 'directory', 'permission' => 'directory.view', 'order' => 20],
-                ['label' => 'Departments', 'icon' => 'diagram-3', 'url' => 'admin/departments', 'permission' => 'departments.manage', 'order' => 35, 'group' => 'admin'],
+                ['label' => 'Departments', 'icon' => 'diagram-3', 'url' => 'admin/departments', 'permission' => 'departments.manage', 'order' => 35, 'group' => 'admin', 'section' => 'people', 'summary' => 'Maintain the departments people belong to.'],
             ],
         ],
         'users' => [
@@ -99,8 +126,8 @@ class Backoffice extends BaseConfig
                 'users.assign_roles' => 'Assign roles to users',
             ],
             'menu' => [
-                ['label' => 'Users', 'icon' => 'people', 'url' => 'admin/users', 'permission' => 'users.view', 'order' => 30, 'group' => 'admin'],
-                ['label' => 'Change requests', 'icon' => 'inbox', 'url' => 'admin/requests', 'permission' => 'users.edit', 'order' => 32, 'group' => 'admin'],
+                ['label' => 'Users', 'icon' => 'people', 'url' => 'admin/users', 'permission' => 'users.view', 'order' => 30, 'group' => 'admin', 'section' => 'people', 'summary' => 'Add people, change their details and roles, and switch accounts on or off.'],
+                ['label' => 'Change requests', 'icon' => 'inbox', 'url' => 'admin/requests', 'permission' => 'users.edit', 'order' => 32, 'group' => 'admin', 'section' => 'people', 'summary' => 'Approve or decline changes people have asked to make to their profile.'],
             ],
         ],
         'roles' => [
@@ -116,7 +143,7 @@ class Backoffice extends BaseConfig
                 'roles.manage' => 'Create roles and edit their permissions',
             ],
             'menu' => [
-                ['label' => 'Roles', 'icon' => 'shield-lock', 'url' => 'admin/roles', 'permission' => 'roles.manage', 'order' => 40, 'group' => 'admin'],
+                ['label' => 'Roles', 'icon' => 'shield-lock', 'url' => 'admin/roles', 'permission' => 'roles.manage', 'order' => 40, 'group' => 'admin', 'section' => 'people', 'summary' => 'Create roles and choose what each role can do.'],
             ],
         ],
         'tenancy' => [
@@ -134,58 +161,120 @@ class Backoffice extends BaseConfig
                 'tenancy.group_level' => 'Grant or remove group-level access (sees every company)',
             ],
             'menu' => [
-                ['label' => 'Companies', 'icon' => 'buildings', 'url' => 'admin/companies', 'permission' => 'companies.manage', 'order' => 36, 'group' => 'admin'],
-                ['label' => 'Group-level users', 'icon' => 'globe2', 'url' => 'admin/group-level', 'permission' => 'tenancy.group_level', 'order' => 37, 'group' => 'admin'],
+                ['label' => 'Companies', 'icon' => 'buildings', 'url' => 'admin/companies', 'permission' => 'companies.manage', 'order' => 36, 'group' => 'admin', 'section' => 'people', 'summary' => 'Set up companies and who belongs to each one.'],
+                ['label' => 'Group-level users', 'icon' => 'globe2', 'url' => 'admin/group-level', 'permission' => 'tenancy.group_level', 'order' => 37, 'group' => 'admin', 'section' => 'people', 'summary' => 'Choose who can see across every company.'],
             ],
         ],
-        'invoices' => [
-            'version'     => '1.5.0',
+        'payables' => [
+            'version'     => '2.1.0',
             'roles'       => [
                 'user' => [
-                    'key'         => 'invoice_user',
-                    'name'        => 'Invoices User',
+                    'key'         => 'payables_user',
+                    'name'        => 'Payables User',
                     'description' => 'Opens the invoice register and My tasks, creates and submits invoices, approves for companies they belong to, runs reports. Company rights decide what they see.',
-                    'permissions' => ['invoices.view', 'invoices.reports', 'suppliers.view'],
+                    'permissions' => ['payables.view', 'payables.reports', 'suppliers.view'],
                 ],
                 'manager' => [
-                    'key'         => 'invoice_workflow',
-                    'name'        => 'Invoices Manager',
-                    'description' => 'Everything an Invoices User can do, plus approval routes, route variants, invoice types, teams, delegations for others and the supplier list.',
-                    'permissions' => ['invoices.manage', 'invoices.workflow', 'suppliers.manage'],
+                    'key'         => 'payables_workflow',
+                    'name'        => 'Payables Manager',
+                    'description' => 'Everything a Payables User can do, plus approval routes, route variants, invoice types, teams, delegations for others and the supplier list.',
+                    'permissions' => ['payables.manage', 'payables.workflow', 'suppliers.manage'],
                 ],
             ],
             'optional'    => true,
-            'title'       => 'Invoices',
+            'title'       => 'Payables',
             'description' => 'Invoice register and approval workflow: routes, teams, delegations, reports.',
             // Sidebar: this module's user-facing entries sit under one collapsible heading; its admin entries join 'admin'.
-            'group'       => ['label' => 'Invoices', 'icon' => 'receipt', 'order' => 69],
-            'dashboard'   => ['label' => 'Invoices', 'icon' => 'receipt', 'permission' => 'invoices.view', 'order' => 10, 'provider' => \App\Core\Invoices\DashboardTab::class],
+            'group'       => ['label' => 'Payables', 'icon' => 'receipt', 'order' => 69, 'section' => 'accounts'],
+            'dashboard'   => ['label' => 'Payables', 'icon' => 'receipt', 'permission' => 'payables.view', 'order' => 10, 'provider' => \App\Core\Payables\DashboardTab::class],
             'companyAccess' => [
                 'submit'  => ['label' => 'Can submit', 'help' => 'Create and submit invoices for the company.', 'column' => 'can_submit'],
                 'approve' => ['label' => 'Can approve', 'help' => 'Approve invoice steps for the company.', 'column' => 'can_approve'],
             ],
             'permissions' => [
-                'invoices.view'     => 'Open the invoice register, My tasks and the dashboard figures for companies you belong to',
-                'invoices.reports'  => 'Run the outstanding and supplier reports',
-                'invoices.manage'   => 'Manage teams, delegations for others and transfer invoice work when someone leaves',
-                'invoices.workflow' => 'Maintain approval routes, route variants and invoice types',
+                'payables.view'     => 'Open the invoice register, My tasks and the dashboard figures for companies you belong to',
+                'payables.reports'  => 'Run the outstanding and supplier reports',
+                'payables.manage'   => 'Manage teams, delegations for others and transfer invoice work when someone leaves',
+                'payables.workflow' => 'Maintain approval routes, route variants and invoice types',
             ],
             'menu' => [
-                ['label' => 'Invoice overview', 'icon' => 'speedometer', 'url' => 'invoices/overview', 'permission' => 'invoices.view', 'order' => 69],
-                ['label' => 'My tasks', 'icon' => 'check2-square', 'url' => 'approvals', 'permission' => 'invoices.view', 'order' => 70, 'badge' => 'invoices.waiting'],
-                ['label' => 'All invoices', 'icon' => 'file-earmark-text', 'url' => 'invoices', 'permission' => 'invoices.view', 'order' => 71, 'unless' => 'status'],
-                ['label' => 'Drafts', 'icon' => 'pencil-square', 'url' => 'invoices?status=draft', 'permission' => 'invoices.view', 'order' => 71.1],
-                ['label' => 'In approval', 'icon' => 'hourglass-split', 'url' => 'invoices?status=open', 'permission' => 'invoices.view', 'order' => 71.2],
-                ['label' => 'Approved', 'icon' => 'check-circle', 'url' => 'invoices?status=approved', 'permission' => 'invoices.view', 'order' => 71.3],
-                ['label' => 'Returned', 'icon' => 'arrow-return-left', 'url' => 'invoices?status=returned', 'permission' => 'invoices.view', 'order' => 71.4],
-                ['label' => 'Rejected', 'icon' => 'x-circle', 'url' => 'invoices?status=rejected', 'permission' => 'invoices.view', 'order' => 71.5],
-                ['label' => 'Processed', 'icon' => 'gear', 'url' => 'invoices?status=processed', 'permission' => 'invoices.view', 'order' => 71.6],
-                ['label' => 'Paid', 'icon' => 'cash-coin', 'url' => 'invoices?status=paid', 'permission' => 'invoices.view', 'order' => 71.7],
-                ['label' => 'Invoice reports', 'icon' => 'bar-chart-line', 'url' => 'reports', 'permission' => 'invoices.reports', 'order' => 72],
-                ['label' => 'Approval routes', 'icon' => 'diagram-2', 'url' => 'invoices-admin/routes', 'permission' => 'invoices.workflow', 'order' => 73, 'group' => 'admin'],
-                ['label' => 'Teams', 'icon' => 'people-fill', 'url' => 'invoices-admin/teams', 'permission' => 'invoices.manage', 'order' => 74, 'group' => 'admin'],
-                ['label' => 'Invoice types', 'icon' => 'tags', 'url' => 'invoices-admin/default-invoice-types', 'permission' => 'invoices.workflow', 'order' => 76, 'group' => 'admin'],
-                ['label' => 'Route variants', 'icon' => 'signpost-split', 'url' => 'invoices-admin/route-variants', 'permission' => 'invoices.workflow', 'order' => 77, 'group' => 'admin'],
+                ['label' => 'Invoice overview', 'icon' => 'speedometer', 'url' => 'payables/overview', 'permission' => 'payables.view', 'order' => 69],
+                ['label' => 'My tasks', 'icon' => 'check2-square', 'url' => 'approvals', 'permission' => 'payables.view', 'order' => 70, 'badge' => 'payables.waiting'],
+                ['label' => 'All invoices', 'icon' => 'file-earmark-text', 'url' => 'payables', 'permission' => 'payables.view', 'order' => 71, 'unless' => 'status'],
+                ['label' => 'Drafts', 'icon' => 'pencil-square', 'url' => 'payables?status=draft', 'permission' => 'payables.view', 'order' => 71.1],
+                ['label' => 'In approval', 'icon' => 'hourglass-split', 'url' => 'payables?status=open', 'permission' => 'payables.view', 'order' => 71.2],
+                ['label' => 'Approved', 'icon' => 'check-circle', 'url' => 'payables?status=approved', 'permission' => 'payables.view', 'order' => 71.3],
+                ['label' => 'Returned', 'icon' => 'arrow-return-left', 'url' => 'payables?status=returned', 'permission' => 'payables.view', 'order' => 71.4],
+                ['label' => 'Rejected', 'icon' => 'x-circle', 'url' => 'payables?status=rejected', 'permission' => 'payables.view', 'order' => 71.5],
+                ['label' => 'Processed', 'icon' => 'gear', 'url' => 'payables?status=processed', 'permission' => 'payables.view', 'order' => 71.6],
+                ['label' => 'Paid', 'icon' => 'cash-coin', 'url' => 'payables?status=paid', 'permission' => 'payables.view', 'order' => 71.7],
+                ['label' => 'Invoice reports', 'icon' => 'bar-chart-line', 'url' => 'reports', 'permission' => 'payables.reports', 'order' => 72],
+                ['label' => 'Approval routes', 'icon' => 'diagram-2', 'url' => 'payables-admin/routes', 'permission' => 'payables.workflow', 'order' => 73, 'group' => 'admin', 'section' => 'payables', 'summary' => 'Build the approval steps supplier invoices follow.'],
+                ['label' => 'Teams', 'icon' => 'people-fill', 'url' => 'payables-admin/teams', 'permission' => 'payables.manage', 'order' => 74, 'group' => 'admin', 'section' => 'payables', 'summary' => 'Group people so a team can share invoice work.'],
+                ['label' => 'Invoice types', 'icon' => 'tags', 'url' => 'payables-admin/default-invoice-types', 'permission' => 'payables.workflow', 'order' => 76, 'group' => 'admin', 'section' => 'payables', 'summary' => 'Maintain the kinds of supplier invoice.'],
+                ['label' => 'Route variants', 'icon' => 'signpost-split', 'url' => 'payables-admin/route-variants', 'permission' => 'payables.workflow', 'order' => 77, 'group' => 'admin', 'section' => 'payables', 'summary' => 'Define variations of an approval route.'],
+            ],
+        ],
+        'receivables' => [
+            'version'     => '1.9.0',
+            'cron'        => [
+                ['command' => 'receivables:remind', 'label' => 'Overdue customer invoice reminders', 'every' => 1440, 'example' => '30 6 * * *'],
+                ['command' => 'receivables:subscriptions', 'label' => 'Subscription billing and upcoming-due notices', 'every' => 1440, 'example' => '45 6 * * *'],
+            ],
+            'roles'       => [
+                'user' => [
+                    'key'         => 'receivables_user',
+                    'name'        => 'Receivables User',
+                    'description' => 'Opens the customer invoice register and My tasks, raises and submits invoices, approves and issues for companies they belong to, records payments received, runs reports. Company rights decide what they see and do.',
+                    'permissions' => ['receivables.view', 'receivables.reports', 'receivables.collect', 'customers.view'],
+                ],
+                'manager' => [
+                    'key'         => 'receivables_workflow',
+                    'name'        => 'Receivables Manager',
+                    'description' => 'Everything a Receivables User can do, plus approval routes, route variants, invoice types, teams, delegations for others and the customer list.',
+                    'permissions' => ['receivables.manage', 'receivables.workflow', 'customers.manage'],
+                ],
+            ],
+            'optional'    => true,
+            'title'       => 'Receivables',
+            'description' => 'Customer invoices: approval and issue workflow, payments received, overdue reminders, reports.',
+            'dashboard'   => ['label' => 'Receivables', 'icon' => 'cash-coin', 'permission' => 'receivables.view', 'order' => 11, 'provider' => \App\Core\Receivables\ArDashboardTab::class],
+            'companyAccess' => [
+                'submit'  => ['label' => 'Can raise', 'help' => 'Create and submit customer invoices for the company.'],
+                'approve' => ['label' => 'Can approve and issue', 'help' => 'Approve and issue customer invoice steps for the company.'],
+                'collect' => ['label' => 'Can record payments', 'help' => 'Record payments received against issued customer invoices for the company.'],
+            ],
+            'customerUsage' => [
+                'receivables_invoices' => 'SELECT COUNT(*) FROM ar_invoices WHERE customer_id = {id}',
+                'receivables_subscriptions' => 'SELECT COUNT(*) FROM ar_subscriptions WHERE customer_id = {id}',
+            ],
+            'permissions' => [
+                'receivables.view'     => 'Open the customer invoice register, My tasks and the dashboard figures for companies you belong to',
+                'receivables.reports'  => 'Run the outstanding, ageing and collections reports',
+                'receivables.collect'  => 'Record and reverse payments received (also needs the per-company right)',
+                'receivables.manage'   => 'Manage teams, delegations for others and transfer customer invoice work when someone leaves',
+                'receivables.workflow' => 'Maintain approval routes, route variants and invoice types for customer invoices',
+            ],
+            // Sidebar: one collapsible heading, like Payables; its admin entries (routes, types, variants, teams) join 'admin'.
+            'group'       => ['label' => 'Receivables', 'icon' => 'cash-coin', 'order' => 70, 'section' => 'accounts'],
+            'menu' => [
+                ['label' => 'My customer invoice tasks', 'icon' => 'check2-square', 'url' => 'receivables/tasks', 'permission' => 'receivables.view', 'order' => 69.9, 'badge' => 'receivables.waiting'],
+                ['label' => 'All customer invoices', 'icon' => 'file-earmark-text', 'url' => 'receivables', 'permission' => 'receivables.view', 'order' => 70, 'unless' => 'status'],
+                ['label' => 'Drafts', 'icon' => 'pencil-square', 'url' => 'receivables?status=draft', 'permission' => 'receivables.view', 'order' => 70.1],
+                ['label' => 'In approval', 'icon' => 'hourglass-split', 'url' => 'receivables?status=open', 'permission' => 'receivables.view', 'order' => 70.2],
+                ['label' => 'To be issued', 'icon' => 'send', 'url' => 'receivables?status=approved', 'permission' => 'receivables.view', 'order' => 70.3],
+                ['label' => 'Outstanding', 'icon' => 'cash-stack', 'url' => 'receivables?status=collecting', 'permission' => 'receivables.view', 'order' => 70.4],
+                ['label' => 'Overdue', 'icon' => 'exclamation-triangle', 'url' => 'receivables?status=overdue', 'permission' => 'receivables.view', 'order' => 70.5],
+                ['label' => 'Paid', 'icon' => 'check2-circle', 'url' => 'receivables?status=paid', 'permission' => 'receivables.view', 'order' => 70.6],
+                ['label' => 'Returned', 'icon' => 'arrow-return-left', 'url' => 'receivables?status=returned', 'permission' => 'receivables.view', 'order' => 70.7],
+                ['label' => 'Customer invoice reports', 'icon' => 'bar-chart-line', 'url' => 'receivables/reports', 'permission' => 'receivables.reports', 'order' => 70.75],
+                ['label' => 'Subscriptions', 'icon' => 'arrow-repeat', 'url' => 'receivables/subscriptions', 'permission' => 'receivables.view', 'order' => 70.77],
+                ['label' => 'My delegations', 'icon' => 'person-check', 'url' => 'receivables/delegations', 'permission' => 'receivables.view', 'order' => 70.8],
+                ['label' => 'Customer invoice routes', 'icon' => 'diagram-2', 'url' => 'receivables-admin/routes', 'permission' => 'receivables.workflow', 'order' => 78, 'group' => 'admin', 'section' => 'receivables', 'summary' => 'Build the approval steps customer invoices follow.'],
+                ['label' => 'Customer invoice teams', 'icon' => 'people-fill', 'url' => 'receivables-admin/teams', 'permission' => 'receivables.manage', 'order' => 79, 'group' => 'admin', 'section' => 'receivables', 'summary' => 'Group people so a team can share customer invoice work.'],
+                ['label' => 'Hand over customer invoice work', 'icon' => 'person-dash', 'url' => 'receivables-admin/handover', 'permission' => 'receivables.manage', 'order' => 79.05, 'group' => 'admin', 'section' => 'receivables', 'summary' => 'Pass customer invoice work to someone else, for example when a person leaves.'],
+                ['label' => 'Customer invoice types', 'icon' => 'tags', 'url' => 'receivables-admin/invoice-types', 'permission' => 'receivables.workflow', 'order' => 79.1, 'group' => 'admin', 'section' => 'receivables', 'summary' => 'Maintain the kinds of customer invoice.'],
+                ['label' => 'Customer route variants', 'icon' => 'signpost-split', 'url' => 'receivables-admin/route-variants', 'permission' => 'receivables.workflow', 'order' => 79.2, 'group' => 'admin', 'section' => 'receivables', 'summary' => 'Define variations of a customer invoice route.'],
             ],
         ],
         'modules' => [
@@ -201,7 +290,7 @@ class Backoffice extends BaseConfig
                 'modules.manage' => 'Switch optional modules on or off',
             ],
             'menu' => [
-                ['label' => 'Modules', 'icon' => 'puzzle', 'url' => 'admin/modules', 'permission' => 'modules.manage', 'order' => 65, 'group' => 'admin'],
+                ['label' => 'Modules', 'icon' => 'puzzle', 'url' => 'admin/modules', 'permission' => 'modules.manage', 'order' => 65, 'group' => 'admin', 'section' => 'system', 'summary' => 'Switch optional modules on or off.'],
             ],
         ],
         'suppliers' => [
@@ -223,7 +312,29 @@ class Backoffice extends BaseConfig
                 'suppliers.manage' => 'Add, edit, switch off and bulk upload suppliers',
             ],
             'menu' => [
-                ['label' => 'Suppliers', 'icon' => 'shop', 'url' => 'admin/suppliers', 'permission' => 'suppliers.manage', 'order' => 66, 'group' => 'admin'],
+                ['label' => 'Suppliers', 'icon' => 'shop', 'url' => 'admin/suppliers', 'permission' => 'suppliers.manage', 'order' => 66, 'group' => 'admin', 'section' => 'data', 'summary' => 'The shared supplier list used across the platform.'],
+            ],
+        ],
+        'customers' => [
+            'version'     => '1.1.2',
+            'roles'       => [
+                'user' => [
+                    'name'        => 'Customers User',
+                    'description' => 'Pick from and search the shared customer list.',
+                    'permissions' => ['customers.view'],
+                ],
+                'manager' => [
+                    'name'        => 'Customers Manager',
+                    'description' => 'Everything a Customers User can do, plus add, edit, switch off and bulk upload customers and keep their contacts.',
+                    'permissions' => ['customers.manage'],
+                ],
+            ],
+            'permissions' => [
+                'customers.view'   => 'Pick from and search the shared customer list (modules that use customers need this)',
+                'customers.manage' => 'Add, edit, switch off and bulk upload customers, and keep their contacts',
+            ],
+            'menu' => [
+                ['label' => 'Customers', 'icon' => 'people', 'url' => 'admin/customers', 'permission' => 'customers.manage', 'order' => 67, 'group' => 'admin', 'section' => 'data', 'summary' => 'The shared customer list and its contacts.'],
             ],
         ],
         'audit' => [
@@ -239,7 +350,7 @@ class Backoffice extends BaseConfig
                 'audit.view' => 'View the audit log',
             ],
             'menu' => [
-                ['label' => 'Audit log', 'icon' => 'journal-text', 'url' => 'admin/audit', 'permission' => 'audit.view', 'order' => 50, 'group' => 'admin'],
+                ['label' => 'Audit log', 'icon' => 'journal-text', 'url' => 'admin/audit', 'permission' => 'audit.view', 'order' => 50, 'group' => 'admin', 'section' => 'system', 'summary' => 'See who did what and when.'],
             ],
         ],
         'mfa' => [
@@ -255,11 +366,14 @@ class Backoffice extends BaseConfig
                 'mfa.manage' => 'Turn multi-factor authentication on or off and choose who must use it',
             ],
             'menu' => [
-                ['label' => 'Multi-factor auth', 'icon' => 'shield-check', 'url' => 'admin/mfa', 'permission' => 'mfa.manage', 'order' => 55, 'group' => 'admin'],
+                ['label' => 'Multi-factor auth', 'icon' => 'shield-check', 'url' => 'admin/mfa', 'permission' => 'mfa.manage', 'order' => 55, 'group' => 'admin', 'section' => 'system', 'summary' => 'Turn two-step verification on and choose who must use it.'],
             ],
         ],
         'entra' => [
-            'version'     => '1.1.0',
+            'version'     => '1.1.1',
+            'cron'        => [
+                ['command' => 'entra:sync', 'label' => 'Microsoft Entra directory sync', 'every' => 240, 'example' => '0 */4 * * *'],
+            ],
             'roles'       => [
                 'manager' => [
                     'name'        => 'Entra Manager',
@@ -271,7 +385,47 @@ class Backoffice extends BaseConfig
                 'entra.manage' => 'Configure Microsoft Entra and run directory sync',
             ],
             'menu' => [
-                ['label' => 'Microsoft Entra', 'icon' => 'microsoft', 'url' => 'admin/entra', 'permission' => 'entra.manage', 'order' => 60, 'group' => 'admin'],
+                ['label' => 'Microsoft Entra', 'icon' => 'microsoft', 'url' => 'admin/entra', 'permission' => 'entra.manage', 'order' => 60, 'group' => 'admin', 'section' => 'system', 'summary' => 'Connect Microsoft Entra and sync your directory.'],
+            ],
+        ],
+        'backups' => [
+            'version'     => '1.0.1',
+            'cron'        => [
+                ['command' => 'backup:run', 'label' => 'Database backup', 'every' => 1440, 'example' => '0 2 * * *'],
+                ['command' => 'backup:check', 'label' => 'Backup freshness check', 'every' => 60, 'example' => '15 * * * *'],
+            ],
+            'roles'       => [
+                'manager' => [
+                    'name'        => 'Backup Manager',
+                    'description' => 'See backup status, set up destinations and run backups.',
+                    'permissions' => ['backups.view', 'backups.manage'],
+                ],
+            ],
+            'permissions' => [
+                'backups.view'   => 'See the status of database backups',
+                'backups.manage' => 'Set up backup destinations and run backups',
+            ],
+            'menu' => [
+                ['label' => 'Backups', 'icon' => 'cloud-arrow-up', 'url' => 'admin/backups', 'permission' => 'backups.view', 'order' => 70, 'group' => 'admin', 'section' => 'system', 'summary' => 'Check that database backups are running and where they are sent.'],
+            ],
+        ],
+        'cron' => [
+            'version'     => '1.0.0',
+            'cron'        => [
+                ['command' => 'cron:check', 'label' => 'Cron job check and alerts', 'every' => 60, 'example' => '5 * * * *'],
+            ],
+            'roles'       => [
+                'manager' => [
+                    'name'        => 'Cron Monitor',
+                    'description' => 'See whether scheduled jobs are running.',
+                    'permissions' => ['cron.view'],
+                ],
+            ],
+            'permissions' => [
+                'cron.view' => 'See the status of scheduled (cron) jobs',
+            ],
+            'menu' => [
+                ['label' => 'Cron jobs', 'icon' => 'clock-history', 'url' => 'admin/cron', 'permission' => 'cron.view', 'order' => 75, 'group' => 'admin', 'section' => 'system', 'summary' => 'See whether scheduled jobs are running and when they last ran.'],
             ],
         ],
     ];
@@ -292,12 +446,12 @@ class Backoffice extends BaseConfig
         'admin' => [
             'name'        => 'Admin',
             'description' => 'Manages users, departments and the audit log.',
-            'permissions' => ['directory.view', 'departments.manage', 'users.view', 'users.create', 'users.edit', 'users.delete', 'users.assign_roles', 'audit.view', 'companies.manage', 'tenancy.memberships', 'suppliers.view', 'suppliers.manage', 'invoices.view', 'invoices.reports', 'invoices.manage', 'invoices.workflow'],
+            'permissions' => ['directory.view', 'departments.manage', 'users.view', 'users.create', 'users.edit', 'users.delete', 'users.assign_roles', 'audit.view', 'companies.manage', 'tenancy.memberships', 'suppliers.view', 'suppliers.manage', 'customers.view', 'customers.manage', 'payables.view', 'payables.reports', 'payables.manage', 'payables.workflow', 'receivables.view', 'receivables.reports', 'receivables.collect', 'receivables.manage', 'receivables.workflow', 'backups.view', 'backups.manage', 'cron.view'],
         ],
         'manager' => [
             'name'        => 'Manager',
             'description' => 'Can view users and the staff directory.',
-            'permissions' => ['directory.view', 'users.view', 'suppliers.view', 'invoices.view', 'invoices.reports', 'invoices.manage', 'invoices.workflow'],
+            'permissions' => ['directory.view', 'users.view', 'suppliers.view', 'customers.view', 'customers.manage', 'payables.view', 'payables.reports', 'payables.manage', 'payables.workflow', 'receivables.view', 'receivables.reports', 'receivables.collect', 'receivables.manage', 'receivables.workflow', 'backups.view'],
         ],
         'staff' => [
             'name'        => 'Staff',
@@ -320,21 +474,44 @@ class Backoffice extends BaseConfig
         'account.mfa_changed'     => ['label' => 'My two-factor settings changed', 'in_app' => true, 'email' => true, 'locked' => true],
         'profile.request_new'     => ['label' => 'New profile change request (approvers)', 'in_app' => true, 'email' => false],
         'profile.request_decided' => ['label' => 'My profile change request decided', 'in_app' => true, 'email' => true],
-        'invoice.submitted'      => ['label' => 'An invoice is waiting for my approval', 'in_app' => true, 'email' => true],
-        'invoice.received'       => ['label' => 'My invoice was submitted', 'in_app' => true, 'email' => true],
-        'invoice.step_approved'  => ['label' => 'My invoice moved to the next step', 'in_app' => true, 'email' => true],
-        'invoice.processed'      => ['label' => 'My invoice was processed', 'in_app' => true, 'email' => true],
-        'invoice.paid'           => ['label' => 'My invoice was paid', 'in_app' => true, 'email' => true],
-        'invoice.rejected'       => ['label' => 'My invoice was rejected', 'in_app' => true, 'email' => true],
-        'invoice.returned'       => ['label' => 'My invoice was returned for changes', 'in_app' => true, 'email' => true],
-        'invoice.resubmitted'    => ['label' => 'An invoice I approve was resubmitted', 'in_app' => true, 'email' => true],
-        'invoice.returned_step'  => ['label' => 'An invoice was returned to me by the next approver', 'in_app' => true, 'email' => true],
-        'invoice.override'       => ['label' => 'A group-level user acted on my step or invoice', 'in_app' => true, 'email' => true],
-        'invoice.notify_step'    => ['label' => 'I am copied on an invoice', 'in_app' => true, 'email' => true],
-        'invoice.claimed'        => ['label' => 'A team member accepted an invoice', 'in_app' => true, 'email' => true],
-        'invoice.released'       => ['label' => 'An invoice was released back to my team', 'in_app' => true, 'email' => true],
-        'invoice.document_added' => ['label' => 'A supporting document was added to my invoice', 'in_app' => true, 'email' => true],
+        'payables.submitted'      => ['label' => 'An invoice is waiting for my approval', 'in_app' => true, 'email' => true],
+        'payables.received'       => ['label' => 'My invoice was submitted', 'in_app' => true, 'email' => true],
+        'payables.step_approved'  => ['label' => 'My invoice moved to the next step', 'in_app' => true, 'email' => true],
+        'payables.processed'      => ['label' => 'My invoice was processed', 'in_app' => true, 'email' => true],
+        'payables.paid'           => ['label' => 'My invoice was paid', 'in_app' => true, 'email' => true],
+        'payables.rejected'       => ['label' => 'My invoice was rejected', 'in_app' => true, 'email' => true],
+        'payables.returned'       => ['label' => 'My invoice was returned for changes', 'in_app' => true, 'email' => true],
+        'payables.resubmitted'    => ['label' => 'An invoice I approve was resubmitted', 'in_app' => true, 'email' => true],
+        'payables.returned_step'  => ['label' => 'An invoice was returned to me by the next approver', 'in_app' => true, 'email' => true],
+        'payables.override'       => ['label' => 'A group-level user acted on my step or invoice', 'in_app' => true, 'email' => true],
+        'payables.notify_step'    => ['label' => 'I am copied on an invoice', 'in_app' => true, 'email' => true],
+        'payables.claimed'        => ['label' => 'A team member accepted an invoice', 'in_app' => true, 'email' => true],
+        'payables.released'       => ['label' => 'An invoice was released back to my team', 'in_app' => true, 'email' => true],
+        'payables.document_added' => ['label' => 'A supporting document was added to my invoice', 'in_app' => true, 'email' => true],
+        'ar.submitted'           => ['label' => 'A customer invoice is waiting for my approval', 'in_app' => true, 'email' => true],
+        'ar.received'            => ['label' => 'My customer invoice was submitted', 'in_app' => true, 'email' => true],
+        'ar.step_approved'       => ['label' => 'My customer invoice moved to the next step', 'in_app' => true, 'email' => true],
+        'ar.returned'            => ['label' => 'My customer invoice was returned for changes', 'in_app' => true, 'email' => true],
+        'ar.rejected'            => ['label' => 'My customer invoice was rejected', 'in_app' => true, 'email' => true],
+        'ar.resubmitted'         => ['label' => 'A customer invoice I approve was resubmitted', 'in_app' => true, 'email' => true],
+        'ar.returned_step'       => ['label' => 'A customer invoice was returned to me by the next approver', 'in_app' => true, 'email' => true],
+        'ar.override'            => ['label' => 'A group-level user acted on my customer invoice step or invoice', 'in_app' => true, 'email' => true],
+        'ar.notify_step'         => ['label' => 'I am copied on a customer invoice', 'in_app' => true, 'email' => true],
+        'ar.claimed'             => ['label' => 'A team member accepted a customer invoice', 'in_app' => true, 'email' => true],
+        'ar.released'            => ['label' => 'A customer invoice was released back to my team', 'in_app' => true, 'email' => true],
+        'ar.document_added'      => ['label' => 'A supporting document was added to my customer invoice', 'in_app' => true, 'email' => true],
+        'ar.issued'              => ['label' => 'My customer invoice was issued to the customer', 'in_app' => true, 'email' => true],
+        'ar.payment_received'    => ['label' => 'A payment was recorded on my customer invoice', 'in_app' => true, 'email' => true],
+        'ar.paid'                => ['label' => 'My customer invoice was paid in full', 'in_app' => true, 'email' => true],
+        'ar.payment_reversed'    => ['label' => 'A payment on my customer invoice was reversed', 'in_app' => true, 'email' => true],
+        'ar.overdue'             => ['label' => 'A customer invoice of mine is overdue', 'in_app' => true, 'email' => true],
+        'ar.subscription_due'    => ['label' => 'A customer subscription I look after is about to be billed', 'in_app' => true, 'email' => true],
+        'ar.subscription_billed' => ['label' => 'A draft invoice was created for a customer subscription', 'in_app' => true, 'email' => true],
+        'ar.subscription_failed' => ['label' => 'A customer subscription could not be billed', 'in_app' => true, 'email' => true],
         'entra.sync_failed'       => ['label' => 'Entra directory sync failed (admins)', 'in_app' => true, 'email' => true],
+        'backups.failed'          => ['label' => 'A database backup failed (backup managers)', 'in_app' => true, 'email' => true],
+        'backups.stale'           => ['label' => 'No recent database backup (backup managers)', 'in_app' => true, 'email' => true],
+        'cron.attention'          => ['label' => 'A scheduled job failed or is late (administrators)', 'in_app' => true, 'email' => true],
     ];
 
     /**

@@ -9,12 +9,12 @@ use App\Core\Dashboard\DashboardTab;
 use CodeIgniter\Test\FeatureTestTrait;
 use Config\Backoffice;
 use Config\Services;
-use Tests\Support\Invoices\InvoiceTestCase;
+use Tests\Support\Payables\PayablesTestCase;
 
 /**
  * The dashboard is a Today tab plus one tab per enabled module the user can use.
  */
-final class DashboardTest extends InvoiceTestCase
+final class DashboardTest extends PayablesTestCase
 {
     use FeatureTestTrait;
 
@@ -62,15 +62,15 @@ final class DashboardTest extends InvoiceTestCase
     {
         $board = new DashboardService();
 
-        $this->assertSame(['invoices', 'users'], array_keys($board->tabsFor($this->admin)));
+        $this->assertSame(['payables', 'receivables', 'users'], array_keys($board->tabsFor($this->admin)));
         $this->assertSame([], $board->tabsFor($this->plain));
     }
 
     public function testSwitchingAModuleOffRemovesItsTab(): void
     {
-        service('modules')->setEnabled('invoices', false);
+        service('modules')->setEnabled('payables', false);
 
-        $this->assertSame(['users'], array_keys((new DashboardService())->tabsFor($this->admin)));
+        $this->assertSame(['receivables', 'users'], array_keys((new DashboardService())->tabsFor($this->admin)));
     }
 
     public function testAnUnknownOrForbiddenTabFallsBackToToday(): void
@@ -78,14 +78,14 @@ final class DashboardTest extends InvoiceTestCase
         $board = new DashboardService();
         $tabs  = $board->tabsFor($this->plain);
 
-        $this->assertSame('today', $board->resolve($tabs, 'invoices'));
+        $this->assertSame('today', $board->resolve($tabs, 'payables'));
         $this->assertSame('today', $board->resolve($tabs, 'nonsense'));
         $this->assertSame('today', $board->resolve($tabs, null));
     }
 
     public function testTheDashboardRendersEveryTabForAnAdmin(): void
     {
-        foreach (['/', '/?tab=invoices', '/?tab=users'] as $path) {
+        foreach (['/', '/?tab=payables', '/?tab=receivables', '/?tab=users'] as $path) {
             $result = $this->as($this->admin, $path);
             $this->assertTrue($result->isOK(), $path);
             $result->assertSee('Today');
@@ -94,7 +94,7 @@ final class DashboardTest extends InvoiceTestCase
 
     public function testAUserWithoutAccessOnlySeesToday(): void
     {
-        $result = $this->as($this->plain, '/?tab=invoices');
+        $result = $this->as($this->plain, '/?tab=payables');
 
         $this->assertTrue($result->isOK());
         $result->assertSee('Unread notifications');

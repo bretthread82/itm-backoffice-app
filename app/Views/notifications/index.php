@@ -23,8 +23,8 @@
     <?php else: ?>
         <ul class="list-group list-group-flush">
             <?php foreach ($rows as $n): ?>
-                <li class="list-group-item p-0">
-                    <a class="d-flex gap-3 align-items-start p-3 text-decoration-none text-body notif-row <?= $n['read_at'] ? '' : 'notif-unread' ?>"
+                <li class="list-group-item p-0 d-flex align-items-start">
+                    <a class="flex-fill d-flex gap-3 align-items-start p-3 text-decoration-none text-body notif-row <?= $n['read_at'] ? '' : 'notif-unread' ?>"
                        href="<?= site_url('notifications/' . $n['id'] . '/open') ?>">
                         <span class="notif-dot mt-2" aria-hidden="true"></span>
                         <span class="flex-fill">
@@ -33,6 +33,12 @@
                         </span>
                         <span class="small text-body-secondary text-nowrap"><?= esc(local_time($n['created_at'])) ?></span>
                     </a>
+                    <?php if (! $n['read_at']): ?>
+                        <form method="post" action="<?= site_url('notifications/' . $n['id'] . '/read') ?>" class="p-2">
+                            <?= csrf_field() ?>
+                            <button class="btn btn-sm btn-outline-secondary" aria-label="Mark as read" title="Mark as read"><i class="bi bi-check2"></i></button>
+                        </form>
+                    <?php endif; ?>
                 </li>
             <?php endforeach; ?>
         </ul>

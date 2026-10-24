@@ -30,6 +30,9 @@ $theme   = $profile['theme'] ?? 'auto';
 
         <div class="page-header">
             <div>
+                <?php if (admin_entry_for() !== null): ?>
+                    <div class="itm-crumb"><a href="<?= site_url('admin') ?>"><i class="bi bi-arrow-left-short" aria-hidden="true"></i>Administration</a></div>
+                <?php endif; ?>
                 <h1><?= esc($title ?? '') ?></h1>
                 <?php if (! empty($subtitle)): ?><div class="subtitle"><?= esc($subtitle) ?></div><?php endif; ?>
             </div>

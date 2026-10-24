@@ -68,20 +68,20 @@ final class TenancyTest extends MfaTestCase
         $uid = $this->makeUser('cap@example.com');
         $m   = service('memberships');
 
-        $m->sync($uid, [$this->a => ['capabilities' => ['demo.review', 'invoices.approve', 'bogus.thing']]]);
+        $m->sync($uid, [$this->a => ['capabilities' => ['demo.review', 'payables.approve', 'bogus.thing']]]);
 
         $scope = service('scope');
         $this->assertTrue($scope->can($uid, $this->a, 'demo.review'));
-        $this->assertTrue($scope->can($uid, $this->a, 'invoices.approve'));
+        $this->assertTrue($scope->can($uid, $this->a, 'payables.approve'));
         $this->assertTrue($scope->canApprove($uid, $this->a));
-        $this->assertFalse($scope->can($uid, $this->a, 'invoices.submit'));
+        $this->assertFalse($scope->can($uid, $this->a, 'payables.submit'));
         $this->assertFalse($scope->can($uid, $this->b, 'demo.review'));
         $this->assertFalse($scope->can($uid, $this->a, 'bogus.thing'), 'Undeclared capabilities are never stored.');
-        $this->assertEqualsCanonicalizing(['demo.review', 'invoices.approve'], $m->forUser($uid)[$this->a]['capabilities']);
+        $this->assertEqualsCanonicalizing(['demo.review', 'payables.approve'], $m->forUser($uid)[$this->a]['capabilities']);
 
         $m->sync($uid, [$this->a => ['capabilities' => []]]);
         $this->assertFalse($scope->can($uid, $this->a, 'demo.review'));
-        $this->assertFalse($scope->can($uid, $this->a, 'invoices.approve'));
+        $this->assertFalse($scope->can($uid, $this->a, 'payables.approve'));
 
         $m->sync($uid, [$this->a => ['capabilities' => ['demo.review']]]);
         $m->sync($uid, []);
@@ -95,7 +95,7 @@ final class TenancyTest extends MfaTestCase
         $m   = service('memberships');
         $m->sync($uid, [$this->a => ['capabilities' => ['demo.review']]]);
 
-        setting()->set('ModuleState.disabled', ['demo', 'invoices']);
+        setting()->set('ModuleState.disabled', ['demo', 'payables', 'receivables']);
         \Config\Services::resetSingle('modules');
         $this->assertSame([], array_keys($m->capabilities()));
 

@@ -87,6 +87,22 @@ entra.clientSecret = 'YOUR-CLIENT-SECRET'
 # entra.deactivateLimitPercent = 25
 
 #--------------------------------------------------------------------
+# DATABASE BACKUPS
+# Backups are encrypted with this passphrase (AES-256-GCM). Use a long random
+# value and keep a copy somewhere safe OFF this server: without it a backup
+# cannot be restored. Do not change it without keeping the old one for
+# restoring older backups. Remote destinations are set up in Admin > Backups.
+#--------------------------------------------------------------------
+
+backups.passphrase = 'YOUR-BACKUP-PASSPHRASE'
+# backups.mysqldumpPath = 'mysqldump'
+# backups.phpPath = 'php'
+# backups.workDir = ''
+# backups.localKeep = 3
+# backups.staleHours = 26
+# backups.requireEncryption = true
+
+#--------------------------------------------------------------------
 # DUO UNIVERSAL PROMPT (optional second factor)
 # Placeholders are ignored until replaced with real values from the Duo
 # Admin Panel (Applications > Protect an Application > Web SDK).

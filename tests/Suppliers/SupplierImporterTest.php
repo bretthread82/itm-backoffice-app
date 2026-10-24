@@ -6,12 +6,12 @@ namespace Tests\Suppliers;
 
 use App\Core\SupplierImporter;
 use RuntimeException;
-use Tests\Support\Invoices\InvoiceTestCase;
+use Tests\Support\Payables\PayablesTestCase;
 
 /**
  * @internal
  */
-final class SupplierImporterTest extends InvoiceTestCase
+final class SupplierImporterTest extends PayablesTestCase
 {
     /** @return list<array<string, string>> */
     private function parseCsv(string $csv): array

@@ -65,7 +65,7 @@ final class SupplierServiceTest extends MfaTestCase
     {
         setting()->set('ModuleState.disabled', []);
         Services::resetSingle('modules');
-        service('modules')->setEnabled('invoices', false);
+        service('modules')->setEnabled('payables', false);
 
         $super = $this->makeSuperUser('super@example.test');
         $this->assertTrue(service('permissions')->can($super, 'suppliers.manage'));

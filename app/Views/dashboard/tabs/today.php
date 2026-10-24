@@ -16,7 +16,7 @@
                 'statIcon'  => 'bi-' . $t['icon'],
                 'statTone'  => $n > 0 ? 'warning' : 'success',
                 'statHref'  => site_url('/?tab=' . $key),
-            ])->include('invoices/components/stat_card') ?>
+            ])->include('payables/components/stat_card') ?>
         </div>
     <?php endforeach; ?>
 </div>

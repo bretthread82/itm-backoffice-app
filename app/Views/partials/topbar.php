@@ -12,7 +12,7 @@ $unread = unread_notification_count();
             <i class="bi bi-moon-stars"></i>
         </button>
 
-        <div class="dropdown" id="notifMenu" data-feed="<?= site_url('notifications/feed') ?>">
+        <div class="dropdown" id="notifMenu" data-feed="<?= site_url('notifications/feed') ?>" data-csrf-header="<?= esc(config('Security')->headerName) ?>">
             <button class="itm-iconbtn btn btn-link" type="button" data-bs-toggle="dropdown"
                     data-bs-auto-close="outside" aria-expanded="false" aria-label="Notifications">
                 <i class="bi bi-bell"></i>
@@ -23,7 +23,10 @@ $unread = unread_notification_count();
             <div class="dropdown-menu dropdown-menu-end shadow p-0 notif-panel">
                 <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
                     <strong>Notifications</strong>
-                    <a class="small" href="<?= site_url('notifications') ?>">View all</a>
+                    <span class="d-flex gap-3 align-items-center">
+                        <button type="button" class="btn btn-link btn-sm p-0" id="notifReadAll" data-url="<?= site_url('notifications/read-all') ?>"<?= $unread ? '' : ' disabled' ?>>Mark all read</button>
+                        <a class="small" href="<?= site_url('notifications') ?>">View all</a>
+                    </span>
                 </div>
                 <div id="notifList" class="list-group list-group-flush">
                     <div class="text-center text-body-secondary small py-4">Loading…</div>
@@ -42,6 +45,9 @@ $unread = unread_notification_count();
                 <li><a class="dropdown-item" href="<?= site_url('profile/security') ?>"><i class="bi bi-key me-2"></i>Password &amp; security</a></li>
                 <li><a class="dropdown-item" href="<?= site_url('profile/notifications') ?>"><i class="bi bi-bell me-2"></i>Notification settings</a></li>
                 <li><a class="dropdown-item" href="<?= site_url('help') ?>"><i class="bi bi-question-circle me-2"></i>Help</a></li>
+                <?php if (admin_tree() !== []): ?>
+                    <li><a class="dropdown-item<?= admin_entry_for() !== null || nav_active('admin', null, null, []) ? ' active' : '' ?>" href="<?= site_url('admin') ?>"><i class="bi bi-gear me-2"></i>Administration</a></li>
+                <?php endif; ?>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="<?= site_url('logout') ?>"><i class="bi bi-box-arrow-right me-2"></i>Sign out</a></li>
             </ul>

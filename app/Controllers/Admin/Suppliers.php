@@ -23,7 +23,7 @@ class Suppliers extends BaseController
         // Modules that reference suppliers add their own usage count here.
         $usage = [];
 
-        if (service('modules')->enabled('invoices')) {
+        if (service('modules')->enabled('payables')) {
             $usage['invoice_count'] = 'SELECT COUNT(*) FROM inv_invoices WHERE supplier_id = {id}';
         }
 
@@ -52,7 +52,7 @@ class Suppliers extends BaseController
         return redirect()->to('admin/suppliers')->with('message', 'Supplier saved.');
     }
 
-    /** Old bookmarks from when suppliers lived inside the Invoices module. */
+    /** Old bookmarks from when suppliers lived inside the Payables module. */
     public function legacy(string $rest = ''): RedirectResponse
     {
         return redirect()->to('admin/suppliers' . ($rest !== '' ? '/' . $rest : ''), 301);

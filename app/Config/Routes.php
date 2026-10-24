@@ -36,6 +36,7 @@ $routes->get('notifications', 'Notifications::index');
 $routes->get('notifications/feed', 'Notifications::feed');
 $routes->get('notifications/(:num)/open', 'Notifications::open/$1');
 $routes->post('notifications/read-all', 'Notifications::readAll');
+$routes->post('notifications/(:num)/read', 'Notifications::markRead/$1');
 
 // Help: any signed-in user; HelpService hides topics by permission (and 404s the rest)
 $routes->get('help', 'Help::index');
@@ -62,44 +63,130 @@ $routes->post('profile/mfa/devices/forget', 'ProfileMfa::forgetDevices');
 $routes->post('profile/notifications', 'Profile::saveNotificationSettings');
 
 // Staff directory
-// ---- Invoices module -----------------------------------------------------------------------
+// ---- Payables module -----------------------------------------------------------------------
 // Visibility inside these screens is decided per company by AccessScope; the permission only opens the door.
-$routes->group('invoices', ['filter' => 'can:invoices.view'], static function (RouteCollection $routes): void {
-    $routes->get('/', 'Invoices::index');
-    $routes->get('overview', 'InvoiceOverview::index');
-    $routes->get('export.csv', 'Invoices::export');
-    $routes->get('new', 'Invoices::new');
-    $routes->get('types', 'Invoices::types');
-    $routes->post('/', 'Invoices::create');
-    $routes->get('delegations', 'InvoiceDelegations::index');
-    $routes->post('delegations', 'InvoiceDelegations::create');
-    $routes->post('delegations/(:num)/end', 'InvoiceDelegations::end/$1');
-    $routes->get('(:num)', 'Invoices::show/$1');
-    $routes->get('(:num)/edit', 'Invoices::edit/$1');
-    $routes->post('(:num)', 'Invoices::update/$1');
-    $routes->get('(:num)/file', 'Invoices::file/$1');
-    $routes->post('(:num)/documents', 'Invoices::addDocument/$1');
-    $routes->get('(:num)/documents/(:num)', 'Invoices::document/$1/$2');
-    $routes->post('(:num)/submit', 'Invoices::submit/$1');
-    $routes->post('(:num)/resubmit', 'Invoices::resubmit/$1');
-    $routes->post('(:num)/cancel', 'Invoices::cancel/$1');
-    $routes->post('(:num)/note', 'Invoices::note/$1');
-    $routes->post('(:num)/act', 'Invoices::act/$1');
-    $routes->post('(:num)/claim', 'Invoices::claim/$1');
-    $routes->post('(:num)/release', 'Invoices::release/$1');
+$routes->group('payables', ['filter' => 'can:payables.view'], static function (RouteCollection $routes): void {
+    $routes->get('/', 'Payables::index');
+    $routes->get('overview', 'PayablesOverview::index');
+    $routes->get('export.csv', 'Payables::export');
+    $routes->get('new', 'Payables::new');
+    $routes->get('types', 'Payables::types');
+    $routes->post('/', 'Payables::create');
+    $routes->get('delegations', 'PayablesDelegations::index');
+    $routes->post('delegations', 'PayablesDelegations::create');
+    $routes->post('delegations/(:num)/end', 'PayablesDelegations::end/$1');
+    $routes->get('(:num)', 'Payables::show/$1');
+    $routes->get('(:num)/edit', 'Payables::edit/$1');
+    $routes->post('(:num)', 'Payables::update/$1');
+    $routes->get('(:num)/file', 'Payables::file/$1');
+    $routes->post('(:num)/documents', 'Payables::addDocument/$1');
+    $routes->get('(:num)/documents/(:num)', 'Payables::document/$1/$2');
+    $routes->post('(:num)/submit', 'Payables::submit/$1');
+    $routes->post('(:num)/resubmit', 'Payables::resubmit/$1');
+    $routes->post('(:num)/cancel', 'Payables::cancel/$1');
+    $routes->post('(:num)/note', 'Payables::note/$1');
+    $routes->post('(:num)/act', 'Payables::act/$1');
+    $routes->post('(:num)/claim', 'Payables::claim/$1');
+    $routes->post('(:num)/release', 'Payables::release/$1');
 });
 
-$routes->get('approvals', 'Approvals::index', ['filter' => 'can:invoices.view']);
+// Old Invoices URLs (module renamed to Payables); kept so bookmarks and older notification links still work.
+$routes->get('invoices', 'LegacyRedirects::invoices');
+$routes->get('invoices/(:any)', 'LegacyRedirects::invoices/$1');
+$routes->get('invoices-admin/(:any)', 'LegacyRedirects::invoicesAdmin/$1');
 
-$routes->group('reports', ['filter' => 'can:invoices.reports'], static function (RouteCollection $routes): void {
+// ---- Receivables module (customer invoices) --------------------------------------------------
+// Visibility inside these screens is decided per company by AccessScope; the permission only opens the door.
+$routes->group('receivables', ['namespace' => 'App\Controllers\Receivables', 'filter' => 'can:receivables.view'], static function (RouteCollection $routes): void {
+    $routes->get('/', 'CustomerInvoices::index');
+    $routes->get('export.csv', 'CustomerInvoices::export');
+    $routes->get('new', 'CustomerInvoices::new');
+    $routes->get('types', 'CustomerInvoices::types');
+    $routes->get('tasks', 'Tasks::index');
+    // Subscriptions: literal routes stay above the (:num) invoice routes below.
+    $routes->get('subscriptions', 'Subscriptions::index');
+    $routes->get('subscriptions/new', 'Subscriptions::new');
+    $routes->post('subscriptions', 'Subscriptions::create');
+    $routes->get('subscriptions/(:num)', 'Subscriptions::show/$1');
+    $routes->get('subscriptions/(:num)/edit', 'Subscriptions::edit/$1');
+    $routes->post('subscriptions/(:num)', 'Subscriptions::update/$1');
+    $routes->post('subscriptions/(:num)/(pause|resume|end)', 'Subscriptions::status/$1/$2');
+    $routes->group('reports', ['filter' => 'can:receivables.reports'], static function (RouteCollection $routes): void {
+        $routes->get('/', 'Reports::index');
+        $routes->get('customers', 'Reports::customers');
+        $routes->get('collections', 'Reports::collections');
+        $routes->get('outstanding.csv', 'Reports::outstandingCsv');
+        $routes->get('customers.csv', 'Reports::customersCsv');
+        $routes->get('collections.csv', 'Reports::collectionsCsv');
+    });
+    $routes->get('delegations', 'Delegations::index');
+    $routes->post('delegations', 'Delegations::create');
+    $routes->post('delegations/(:num)/end', 'Delegations::end/$1');
+    $routes->post('/', 'CustomerInvoices::create');
+    $routes->get('(:num)', 'CustomerInvoices::show/$1');
+    $routes->get('(:num)/edit', 'CustomerInvoices::edit/$1');
+    $routes->post('(:num)', 'CustomerInvoices::update/$1');
+    $routes->get('(:num)/file', 'CustomerInvoices::file/$1');
+    $routes->post('(:num)/documents', 'CustomerInvoices::addDocument/$1');
+    $routes->get('(:num)/documents/(:num)', 'CustomerInvoices::document/$1/$2');
+    $routes->post('(:num)/submit', 'CustomerInvoices::submit/$1');
+    $routes->post('(:num)/resubmit', 'CustomerInvoices::resubmit/$1');
+    $routes->post('(:num)/cancel', 'CustomerInvoices::cancel/$1');
+    $routes->post('(:num)/note', 'CustomerInvoices::note/$1');
+    $routes->post('(:num)/act', 'CustomerInvoices::act/$1');
+    $routes->post('(:num)/claim', 'CustomerInvoices::claim/$1');
+    $routes->post('(:num)/release', 'CustomerInvoices::release/$1');
+    $routes->group('', ['filter' => 'can:receivables.collect'], static function (RouteCollection $routes): void {
+        $routes->post('(:num)/payments', 'CustomerInvoices::recordPayment/$1');
+        $routes->post('(:num)/payments/(:num)/reverse', 'CustomerInvoices::reversePayment/$1/$2');
+    });
+});
+
+$routes->group('receivables-admin', ['namespace' => 'App\Controllers\Receivables\Admin'], static function (RouteCollection $routes): void {
+    $routes->group('', ['filter' => 'can:receivables.workflow'], static function (RouteCollection $routes): void {
+        $routes->get('invoice-types', 'InvoiceTypes::index');
+        $routes->post('invoice-types', 'InvoiceTypes::create');
+        $routes->post('invoice-types/assign', 'InvoiceTypes::assign');
+        $routes->post('invoice-types/(:num)', 'InvoiceTypes::update/$1');
+        $routes->post('invoice-types/(:num)/delete', 'InvoiceTypes::delete/$1');
+        $routes->post('company-types/(:num)/priority', 'InvoiceTypes::setTypePriority/$1');
+
+        $routes->get('routes', 'Routes::index');
+        $routes->get('routes/new', 'Routes::new');
+        $routes->post('routes', 'Routes::create');
+        $routes->get('routes/(:num)/edit', 'Routes::edit/$1');
+        $routes->post('routes/(:num)', 'Routes::update/$1');
+
+        $routes->get('route-variants', 'RouteVariants::index');
+        $routes->get('route-variants/new', 'RouteVariants::new');
+        $routes->post('route-variants', 'RouteVariants::create');
+        $routes->get('route-variants/(:num)/edit', 'RouteVariants::edit/$1');
+        $routes->post('route-variants/(:num)', 'RouteVariants::update/$1');
+        $routes->post('route-variants/(:num)/delete', 'RouteVariants::delete/$1');
+    });
+
+    $routes->group('', ['filter' => 'can:receivables.manage'], static function (RouteCollection $routes): void {
+        $routes->get('teams', 'Teams::index');
+        $routes->get('teams/new', 'Teams::new');
+        $routes->post('teams', 'Teams::create');
+        $routes->get('teams/(:num)/edit', 'Teams::edit/$1');
+        $routes->post('teams/(:num)', 'Teams::update/$1');
+        $routes->get('handover', 'Handover::index');
+        $routes->post('handover', 'Handover::transfer');
+    });
+});
+
+$routes->get('approvals', 'Approvals::index', ['filter' => 'can:payables.view']);
+
+$routes->group('reports', ['filter' => 'can:payables.reports'], static function (RouteCollection $routes): void {
     $routes->get('/', 'Reports::index');
     $routes->get('outstanding.csv', 'Reports::outstandingCsv');
     $routes->get('suppliers', 'Reports::suppliers');
     $routes->get('suppliers.csv', 'Reports::suppliersCsv');
 });
 
-$routes->group('invoices-admin', ['namespace' => 'App\Controllers\InvoiceAdmin'], static function (RouteCollection $routes): void {
-    $routes->group('', ['filter' => 'can:invoices.workflow'], static function (RouteCollection $routes): void {
+$routes->group('payables-admin', ['namespace' => 'App\Controllers\PayablesAdmin'], static function (RouteCollection $routes): void {
+    $routes->group('', ['filter' => 'can:payables.workflow'], static function (RouteCollection $routes): void {
         // Suppliers moved to core: admin/suppliers (old URLs redirect).
         $routes->get('suppliers', '\App\Controllers\Admin\Suppliers::legacy');
         $routes->get('suppliers/(:any)', '\App\Controllers\Admin\Suppliers::legacy/');
@@ -125,7 +212,7 @@ $routes->group('invoices-admin', ['namespace' => 'App\Controllers\InvoiceAdmin']
         $routes->post('route-variants/(:num)/delete', 'RouteVariants::delete/$1');
     });
 
-    $routes->group('', ['filter' => 'can:invoices.manage'], static function (RouteCollection $routes): void {
+    $routes->group('', ['filter' => 'can:payables.manage'], static function (RouteCollection $routes): void {
         $routes->get('teams', 'Teams::index');
         $routes->get('teams/new', 'Teams::new');
         $routes->post('teams', 'Teams::create');
@@ -140,6 +227,10 @@ $routes->group('directory',['filter' => 'can:directory.view'], static function (
 });
 
 $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], static function (RouteCollection $routes): void {
+    // Admin dashboard: every option the signed-in user may use. No can: filter, as the options come from many
+    // permissions; the controller answers 404 when the user has none.
+    $routes->get('/', 'Home::index');
+
     // Users
     $routes->get('users', 'Users::index', ['filter' => 'can:users.view']);
     $routes->get('users/new', 'Users::new', ['filter' => 'can:users.create']);
@@ -160,6 +251,21 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], static functio
         $routes->post('upload/preview', 'Suppliers::uploadPreview');
         $routes->post('upload/commit', 'Suppliers::uploadCommit');
         $routes->post('(:num)', 'Suppliers::update/$1');
+    });
+
+    $routes->group('customers', ['filter' => 'can:customers.manage'], static function (RouteCollection $routes): void {
+        $routes->get('/', 'Customers::index');
+        $routes->post('/', 'Customers::create');
+        $routes->get('upload', 'Customers::uploadForm');
+        $routes->get('upload/template', 'Customers::template');
+        $routes->post('upload/preview', 'Customers::uploadPreview');
+        $routes->post('upload/commit', 'Customers::uploadCommit');
+        $routes->get('(:num)', 'Customers::edit/$1');
+        $routes->post('(:num)', 'Customers::update/$1');
+        $routes->post('(:num)/contacts', 'Customers::addContact/$1');
+        $routes->post('(:num)/contacts/(:num)/delete', 'Customers::removeContact/$1/$2');
+        $routes->post('(:num)/contacts/(:num)/notify', 'Customers::notifyContact/$1/$2');
+        $routes->post('(:num)/contacts/clear-notify', 'Customers::clearNotifyContact/$1');
     });
 
     $routes->get('modules', 'Modules::index', ['filter' => 'can:modules.manage']);
@@ -201,6 +307,24 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], static functio
     // Multi-factor authentication policy
     $routes->get('mfa', 'Mfa::index', ['filter' => 'can:mfa.manage']);
     $routes->post('mfa', 'Mfa::save', ['filter' => 'can:mfa.manage']);
+
+    // Scheduled (cron) job status, administrators
+    $routes->get('cron', 'Cron::index', ['filter' => 'can:cron.view']);
+
+    // Database backups: status for viewers, everything else for managers
+    $routes->group('backups', ['filter' => 'can:backups.view'], static function (RouteCollection $routes): void {
+        $routes->get('/', 'Backups::index');
+        $routes->get('runs/(:num)', 'Backups::show/$1');
+    });
+    $routes->group('backups', ['filter' => 'can:backups.manage'], static function (RouteCollection $routes): void {
+        $routes->post('run', 'Backups::run');
+        $routes->get('destinations/new', 'BackupDestinations::create');
+        $routes->post('destinations', 'BackupDestinations::store');
+        $routes->get('destinations/(:num)/edit', 'BackupDestinations::edit/$1');
+        $routes->post('destinations/(:num)', 'BackupDestinations::update/$1');
+        $routes->post('destinations/(:num)/test', 'BackupDestinations::test/$1');
+        $routes->post('destinations/(:num)/delete', 'BackupDestinations::delete/$1');
+    });
 
     // Microsoft Entra
     $routes->group('entra', ['filter' => 'can:entra.manage'], static function (RouteCollection $routes): void {

@@ -91,7 +91,7 @@ class AccessScope
     }
 
     /**
-     * Whether the user holds a module's per-company capability, e.g. 'invoices.approve', as set on
+     * Whether the user holds a module's per-company capability, e.g. 'payables.approve', as set on
      * Manage company access. Group-level users gain nothing here; they need their own membership.
      * Undeclared capabilities are never held.
      */
@@ -112,14 +112,42 @@ class AccessScope
             ->countAllResults() > 0;
     }
 
+    /**
+     * Active companies where the user holds a per-company capability (for example 'receivables.submit'), by code.
+     * For listing choices in a form; use can() to check one company.
+     *
+     * @return list<array{id: int, code: string, name: string}>
+     */
+    public function companiesWith(int $userId, string $capability): array
+    {
+        $declared = config(Backoffice::class)->companyCapabilities()[$capability] ?? null;
+
+        if ($declared === null) {
+            return [];
+        }
+
+        $builder = $this->db->table('companies c')->select('c.id, c.code, c.name')->where('c.active', 1)->orderBy('c.code');
+
+        if ($declared['column'] !== null) {
+            $builder->join('user_companies uc', 'uc.company_id = c.id')->where(['uc.user_id' => $userId, 'uc.' . $declared['column'] => 1]);
+        } else {
+            $builder->join('user_company_capabilities uc', 'uc.company_id = c.id')->where(['uc.user_id' => $userId, 'uc.capability' => $capability]);
+        }
+
+        return array_map(
+            static fn (array $r): array => ['id' => (int) $r['id'], 'code' => (string) $r['code'], 'name' => (string) $r['name']],
+            $builder->get()->getResultArray(),
+        );
+    }
+
     public function canSubmit(int $userId, int $companyId): bool
     {
-        return $this->can($userId, $companyId, 'invoices.submit');
+        return $this->can($userId, $companyId, 'payables.submit');
     }
 
     public function canApprove(int $userId, int $companyId): bool
     {
-        return $this->can($userId, $companyId, 'invoices.approve');
+        return $this->can($userId, $companyId, 'payables.approve');
     }
 
     private function flag(int $userId, int $companyId, string $column): bool

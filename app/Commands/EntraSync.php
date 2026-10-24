@@ -3,18 +3,17 @@
 namespace App\Commands;
 
 use App\Core\Entra\EntraSyncService;
-use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use Config\Entra;
 
-class EntraSync extends BaseCommand
+class EntraSync extends MonitoredCommand
 {
     protected $group       = 'App';
     protected $name        = 'entra:sync';
     protected $description = 'Synchronises users, departments, managers and group roles from Microsoft Entra.';
     protected $usage       = 'entra:sync';
 
-    public function run(array $params)
+    protected function handle(array $params)
     {
         $config = config(Entra::class);
 
@@ -30,6 +29,7 @@ class EntraSync extends BaseCommand
 
         if (! $lock || ! flock($lock, LOCK_EX | LOCK_NB)) {
             CLI::error('Another sync is already running.');
+            $this->note('Another sync was already running.');
 
             return EXIT_ERROR;
         }
@@ -53,6 +53,10 @@ class EntraSync extends BaseCommand
 
         foreach ($stats['errors'] as $error) {
             CLI::error($error);
+        }
+
+        if ($stats['errors'] !== []) {
+            $this->note(count($stats['errors']) . ' issue(s): ' . $stats['errors'][0]);
         }
 
         return $stats['errors'] === [] ? EXIT_SUCCESS : EXIT_ERROR;

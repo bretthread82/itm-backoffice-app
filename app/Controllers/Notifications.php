@@ -44,6 +44,7 @@ class Notifications extends BaseController
         foreach ($items as &$item) {
             $item['unread'] = $item['read_at'] === null;
             $item['open']   = site_url('notifications/' . $item['id'] . '/open');
+            $item['read']   = site_url('notifications/' . $item['id'] . '/read');
             $item['ago']    = $this->ago($item['created_at']);
             unset($item['read_at']);
         }
@@ -51,6 +52,7 @@ class Notifications extends BaseController
         return $this->response->setHeader('Cache-Control', 'no-store')->setJSON([
             'count' => service('notifier')->unreadCount($userId),
             'items' => $items,
+            'csrf'  => csrf_hash(),
         ]);
     }
 
@@ -75,11 +77,38 @@ class Notifications extends BaseController
         return redirect()->to($url);
     }
 
-    public function readAll(): RedirectResponse
+    /**
+     * Marks one notification read without following its link. Scoped to the owner.
+     */
+    public function markRead(int $id): RedirectResponse|ResponseInterface
     {
-        service('notifier')->markAllRead((int) auth()->id());
+        $userId = (int) auth()->id();
+        service('notifier')->markRead($id, $userId);
 
-        return redirect()->back()->with('message', 'All notifications marked as read.');
+        return $this->readResponse($userId, 'Notification marked as read.');
+    }
+
+    public function readAll(): RedirectResponse|ResponseInterface
+    {
+        $userId = (int) auth()->id();
+        service('notifier')->markAllRead($userId);
+
+        return $this->readResponse($userId, 'All notifications marked as read.');
+    }
+
+    /**
+     * JSON for the bell (an AJAX request), a redirect for the full page.
+     */
+    private function readResponse(int $userId, string $message): RedirectResponse|ResponseInterface
+    {
+        if ($this->request->isAJAX()) {
+            return $this->response->setHeader('Cache-Control', 'no-store')->setJSON([
+                'count' => service('notifier')->unreadCount($userId),
+                'csrf'  => csrf_hash(),
+            ]);
+        }
+
+        return redirect()->back()->with('message', $message);
     }
 
     private function ago(string $datetime): string

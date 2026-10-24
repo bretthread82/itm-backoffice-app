@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Invoices\InvoiceAudit;
+use App\Core\Payables\InvoiceAudit;
 
-use App\Core\Invoices\Csv;
-use App\Core\Invoices\ReportService;
+use App\Core\Payables\Csv;
+use App\Core\Payables\ReportService;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
@@ -24,7 +24,7 @@ class Reports extends BaseController
         $companies = $reports->visibleCompanies($uid);
         $groupIds  = array_values(array_unique(array_filter(array_column($companies, 'group_id'))));
 
-        return view('invoices/reports/index', [
+        return view('payables/reports/index', [
             'title'     => 'Reports',
             'agg'       => ReportService::aggregate($reports->outstanding($uid, $filters)),
             'counts'    => $reports->countsByStatus($uid, $filters),
@@ -84,7 +84,7 @@ class Reports extends BaseController
         $companies = $reports->visibleCompanies($uid);
         $groupIds  = array_values(array_unique(array_filter(array_column($companies, 'group_id'))));
 
-        return view('invoices/reports/suppliers', [
+        return view('payables/reports/suppliers', [
             'title'       => 'Reports by supplier',
             'outstanding' => ReportService::outstandingBySupplier($reports->outstanding($uid, $filters)),
             'totals'      => $reports->totalsBySupplier($uid, $filters, $type, $anchor),

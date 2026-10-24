@@ -1,0 +1,4 @@
+/* Receivables module: the route builder's drag handle and time-limit field. Built on --itm-* tokens only; nothing here sets a colour. */
+
+.ar-step-handle { cursor: grab; }
+.ar-sla { max-width: 8rem; }

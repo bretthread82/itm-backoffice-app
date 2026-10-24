@@ -17,14 +17,14 @@ final class ModuleServiceTest extends MfaTestCase
     public function testOptionalModulesCanBeSwitchedOffAndOn(): void
     {
         $svc = service('modules');
-        $this->assertTrue($svc->enabled('invoices'));
+        $this->assertTrue($svc->enabled('payables'));
 
-        $svc->setEnabled('invoices', false);
+        $svc->setEnabled('payables', false);
         Services::resetSingle('modules');
-        $this->assertFalse(service('modules')->enabled('invoices'));
+        $this->assertFalse(service('modules')->enabled('payables'));
 
-        service('modules')->setEnabled('invoices', true);
-        $this->assertTrue(service('modules')->enabled('invoices'));
+        service('modules')->setEnabled('payables', true);
+        $this->assertTrue(service('modules')->enabled('payables'));
     }
 
     public function testCoreModulesCannotBeSwitchedOff(): void
@@ -36,11 +36,11 @@ final class ModuleServiceTest extends MfaTestCase
     public function testADisabledModuleRemovesItsPermissionsForEveryoneIncludingSuperAdmins(): void
     {
         $super = $this->makeSuperUser('super@example.test');
-        $this->assertTrue(service('permissions')->can($super, 'invoices.view'));
+        $this->assertTrue(service('permissions')->can($super, 'payables.view'));
 
-        service('modules')->setEnabled('invoices', false);
+        service('modules')->setEnabled('payables', false);
 
-        $this->assertFalse(service('permissions')->can($super, 'invoices.view'));
+        $this->assertFalse(service('permissions')->can($super, 'payables.view'));
         $this->assertTrue(service('permissions')->can($super, 'users.view'), 'Other modules are untouched.');
         $this->assertTrue(service('permissions')->can($super, 'modules.manage'));
 

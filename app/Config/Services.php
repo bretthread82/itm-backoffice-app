@@ -3,6 +3,7 @@
 namespace Config;
 
 use App\Core\AuditService;
+use App\Core\CustomerService;
 use App\Core\HelpService;
 use App\Core\Mailer;
 use App\Core\SupplierService;
@@ -123,14 +124,19 @@ class Services extends BaseService
     /**
      * Where invoice files live (writable/uploads on this server). Tests replace it with Services::injectMock('fileStore', ...).
      */
-    public static function fileStore(bool $getShared = true): \App\Core\Invoices\Files\FileStore
+    public static function fileStore(bool $getShared = true): \App\Core\Payables\Files\FileStore
     {
-        return $getShared ? static::getSharedInstance('fileStore') : new \App\Core\Invoices\Files\LocalFileStore();
+        return $getShared ? static::getSharedInstance('fileStore') : new \App\Core\Payables\Files\LocalFileStore();
     }
 
     public static function suppliers(bool $getShared = true): SupplierService
     {
         return $getShared ? static::getSharedInstance('suppliers') : new SupplierService();
+    }
+
+    public static function customers(bool $getShared = true): CustomerService
+    {
+        return $getShared ? static::getSharedInstance('customers') : new CustomerService();
     }
 
     public static function modules(bool $getShared = true): ModuleService
